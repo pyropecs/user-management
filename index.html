@@ -1,11 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./styles.css" />
+    <title>User management</title>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="create-form-container">
+        <h1 class="user-title">Create User</h1>
+        <form id="submit-form" class="user-form">
+          <div class="input-container">
+            <input
+              type="text"
+              required
+              name="user-name"
+              placeholder="Username"
+              title="user name"
+              id="username-input"
+            />
+            <span class="error hide" id="username-error">Error</span>
+          </div>
+          <div class="input-container">
+            <input
+              type="email"
+              required
+              name="email"
+              placeholder="Email"
+              title="Email"
+              id="email-input"
+            />
+            <span class="error hide" id="email-error" >Error</span>
+          </div>
+          <div class="input-container">
+            <input
+              type="text"
+              required
+              name="first name"
+              placeholder="First name"
+              title="First name"
+              id="firstname-input"
+            />
+            <span class="error hide" id="firstname-error">Error</span>
+          </div>
+          <div class="input-container">
+            <input
+              type="text"
+              required
+              name="last name"
+              placeholder="Last name"
+              title="Last name"
+              id="lastname-input"
+            />
+            <span class="error hide" id="lastname-error">Error</span>
+          </div>
+
+          <button type="submit" class="add-btn">Add User</button>
+        </form>
+      </div>
+    </div>
+
     <script src="./index.js"></script>
-</body>
+  </body>
 </html>
