@@ -98,7 +98,10 @@ input[type="email"] {
   justify-content: space-between;
 }
 
-
+.title{
+    margin:0%;
+    padding: 1%;
+}
 
 :root {
     --primary-color: #4a90e2;
@@ -165,7 +168,7 @@ input[type="email"] {
 }
 #main {
     transition: margin-left .3s;
-    padding: 20px;
+    height: 100%;
     margin-left: 250px;
 }
 .sidebar.closed {
@@ -267,4 +270,40 @@ input[type="email"] {
 .create-btn:active {
   background-color: #298e46;
   box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+}
+
+table,th,tr{
+    border-collapse: collapse;
+   
+}
+.user-table{
+    width:100%;
+   
+   
+  
+}
+.table-header{
+    padding:1%;
+    /* border-bottom: 1px solid #000; */
+   color:white;
+   background:#1b4965;
+}
+.table-header th{
+    padding:0.5%;
+
+}
+
+.user-table-body{
+    height:50%;
+}
+
+.user-table-row{
+    height:10%;
+    
+    margin:0%;
+border:1px solid #000;
+    text-align: center;
+}
+.user-table-row td{
+    padding:1%;
 }

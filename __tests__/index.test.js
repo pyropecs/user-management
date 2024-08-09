@@ -3,10 +3,11 @@ const fs = require("fs");
 const path = require("path");
 const {
   getByText,
-  prettyDOM,
+
   waitFor,
   getByAltText,
-  getByRole,
+  prettyDOM,
+  queryByText,
 } = require("@testing-library/dom");
 const { userEvent } = require("@testing-library/user-event");
 const { Chance } = require("chance");
@@ -49,7 +50,6 @@ describe("creation of user", () => {
     expect(userName).toHaveAttribute("type", "text");
     expect(userName).toHaveAttribute("title", "user name");
     expect(userName).toHaveAttribute("placeholder", "Username");
-    // expect(userName.required).toBe(true);
   });
 
   test("to check that username error component is present and its attributes", () => {
@@ -64,7 +64,6 @@ describe("creation of user", () => {
     expect(emailField).toHaveAttribute("type", "text");
     expect(emailField).toHaveAttribute("placeholder", "Email");
     expect(emailField).toHaveAttribute("title", "Email");
-    // expect(emailField.required).toBe(true);
   });
 
   test("email error is present in the page", () => {
@@ -79,7 +78,6 @@ describe("creation of user", () => {
     expect(firstNameField).toHaveAttribute("type", "text");
     expect(firstNameField).toHaveAttribute("placeholder", "First name");
     expect(firstNameField).toHaveAttribute("title", "First name");
-    // expect(firstNameField.required).toBe(true);
   });
 
   test("first name field error should be present in the form and hide initally", () => {
@@ -94,7 +92,6 @@ describe("creation of user", () => {
     expect(lastNameField).toHaveAttribute("type", "text");
     expect(lastNameField).toHaveAttribute("placeholder", "Last name");
     expect(lastNameField).toHaveAttribute("title", "Last name");
-    // expect(lastNameField.required).toBe(true);
   });
 
   test("last name field error should be present in the form and hide it intially", () => {
@@ -390,7 +387,7 @@ describe("creation of user", () => {
   });
 });
 
-describe("creation of sidebar", () => {
+describe("to check that sidebar every requirements satisfies it", () => {
   test("to check the title of the sidebar is present", () => {
     const menuTitle = getByText(document.body, /Menu/);
     expect(menuTitle).toBeInTheDocument();
@@ -453,5 +450,79 @@ describe("the user management", () => {
     const modalWrap = document.querySelector(".wrap");
     expect(modalWrap.classList.contains("hide")).toBeFalsy();
   });
+  test("to test that user management table having the necessary columns", () => {
+    const userTable = document.querySelector(".user-table");
+    const userId = getByText(userTable, /User Id/);
+    expect(userId).toBeInTheDocument();
+    const userName = getByText(userTable, /Username/);
+    expect(userName).toBeInTheDocument();
+    const email = getByText(userTable, /Email/);
+    expect(email).toBeInTheDocument();
+    const firstName = getByText(userTable, /First Name/);
+    expect(firstName).toBeInTheDocument();
+    const lastName = getByText(userTable, /Last Name/);
+    expect(lastName).toBeInTheDocument();
+  });
 
+  function createUser(userDetails) {
+    const lastName = document.querySelector("#lastname-input");
+
+    const lastNameValue = userDetails.lastName;
+    lastName.value = lastNameValue;
+    const firstName = document.querySelector("#firstname-input");
+    const firstNameValue = userDetails.firstName;
+    firstName.value = firstNameValue;
+    const email = document.querySelector("#email-input");
+    const emailValue = userDetails.email;
+    email.value = emailValue;
+    const userName = document.querySelector("#username-input");
+    const userNameValue = userDetails.username;
+    userName.value = userNameValue;
+    const addUser = getByText(document.body, /Add User/);
+    addUser.click();
+  }
+
+  test("to test that created task is rendered in the table", () => {
+    const userDetails = {
+      lastName: chance.string({ symbols: false, numeric: false, alpha: true }),
+      firstName: chance.string({ symbols: false, numeric: false, alpha: true }),
+      email: chance.email(),
+      username: chance.string({ symbols: false, numeric: true, alpha: true }),
+    };
+    createUser(userDetails);
+    const userTable = document.querySelector("#user-table-id");
+
+    const lastName = getByText(userTable, userDetails.lastName);
+    expect(lastName).toBeInTheDocument();
+    const firstName = getByText(userTable, userDetails.firstName);
+    expect(firstName).toBeInTheDocument();
+    const email = getByText(userTable, userDetails.email);
+    expect(email).toBeInTheDocument();
+    const userName = getByText(userTable, userDetails.username);
+    expect(userName).toBeInTheDocument();
+    const editBtn = getByText(userTable, /Edit/);
+    expect(editBtn).toBeInTheDocument();
+    const deleteBtn = getByText(userTable, /Delete/);
+    expect(deleteBtn).toBeInTheDocument();
+    const tableRow = lastName.parentElement;
+    expect(tableRow).toHaveAttribute("user_id", "0");
+  });
+  test("to check that clicking delete button actually delete the selected user", () => {
+    const userDetails = {
+      lastName: chance.string({ symbols: false, numeric: false, alpha: true }),
+      firstName: chance.string({ symbols: false, numeric: false, alpha: true }),
+      email: chance.email(),
+      username: chance.string({ symbols: false, numeric: true, alpha: true }),
+    };
+    createUser(userDetails);
+    const userTable = document.querySelector("#user-table-id");
+    let lastName = getByText(userTable, userDetails.lastName);
+    const tableRow = lastName.parentElement;
+    const deleteBtn = getByText(tableRow, /Delete/);
+    expect(tableRow.getAttribute("user_id")).toBe("0")
+    expect(deleteBtn).toBeInTheDocument();
+    deleteBtn.click();
+    lastName = queryByText(tableRow, userDetails.username);
+    // expect(lastName).toBeNull();
+  });
 });

@@ -12,7 +12,7 @@ const toggleBtnId = document.querySelector("#toggle-btn-id");
 const addUserBtn = document.querySelector("#create-btn-id");
 const modalWrap = document.querySelector(".wrap");
 toggleBtnId.addEventListener("click", toggleNav);
-
+window.addEventListener("DOMContentLoaded", renderUsers);
 userName.addEventListener("input", () => {
   userNameError.textContent = "";
 });
@@ -35,8 +35,8 @@ window.addEventListener("mouseup", (event) => {
   const formContainer = document.querySelector(".create-form-container");
 
   if (!formContainer.contains(event.target)) {
-    modalWrap.classList.add("hide")
-}
+    modalWrap.classList.add("hide");
+  }
 });
 createForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -51,6 +51,7 @@ createForm.addEventListener("submit", (e) => {
     lastNameValue,
   };
   const isValid = validateInputs(inputValues);
+  console.log(isValid);
   if (isValid) {
     saveToLocalStorage("users", {
       user_id: numberOfItemsLocalStorage("users"),
@@ -59,6 +60,11 @@ createForm.addEventListener("submit", (e) => {
       firstname: firstNameValue,
       lastname: lastNameValue,
     });
+    renderUsers();
+    userName.value = "";
+    email.value = "";
+    firstName.value = "";
+    lastName.value = "";
   }
 });
 
@@ -68,13 +74,14 @@ function validateInputs({
   firstNameValue,
   lastNameValue,
 }) {
-  let isValid;
-  isValid = validateUserName(userNameValue);
-  isValid = validateEmail(emailValue);
-  isValid = validateFirstName(firstNameValue);
-  isValid = validateLastName(lastNameValue);
+  let isValidEmail, isValidUserName, isValidFirstName, isValidLastName;
 
-  return isValid;
+  isValidUserName = validateUserName(userNameValue);
+  isValidEmail = validateEmail(emailValue);
+  isValidFirstName = validateFirstName(firstNameValue);
+  isValidLastName = validateLastName(lastNameValue);
+
+  return isValidUserName && isValidEmail && isValidFirstName && isValidLastName;
 }
 function validateEmail(emailValue) {
   if (emailValue === "") {
@@ -123,7 +130,6 @@ function validateLastName(lastNameValue) {
 }
 
 function validateUserName(userNameValue) {
-  console.log(userNameValue);
   if (userNameValue === "") {
     userNameError.textContent = "User name is required";
     addError(userNameError);
@@ -154,6 +160,14 @@ function saveToLocalStorage(key, object) {
   const usersJSON = JSON.stringify(users);
   localStorage.setItem(key, usersJSON);
 }
+function getFromLocalStorage(key) {
+  const value = JSON.parse(localStorage.getItem(key));
+  if (value === null) {
+    return [];
+  } else {
+    return value;
+  }
+}
 
 function numberOfItemsLocalStorage(key) {
   let users = JSON.parse(localStorage.getItem(key));
@@ -170,4 +184,59 @@ function toggleNav() {
   if (window.innerWidth <= 768) {
     sidebar.classList.toggle("open");
   }
+}
+
+function renderUsers() {
+  const users = getFromLocalStorage("users");
+
+  const tableBody = document.querySelector("#table-body");
+  tableBody.innerHTML = "";
+  users.forEach((user) => {
+    const tableRow = createTableRow(user);
+
+    tableBody.append(tableRow);
+  });
+}
+
+function createTableRow(user) {
+  const { user_id, username, firstname, lastname, email } = user;
+  const tableRow = document.createElement("tr");
+  tableRow.classList.add("user-table-row");
+  tableRow.setAttribute("user_id", `${user_id}`);
+  tableRow.innerHTML = `
+<td>${String(user_id)}</td>
+<td>${username}</td>
+<td>${firstname}</td>
+<td>${lastname}</td>
+<td>${email}</td>
+<td> <button class="edit-btn" onClick="editUser()" >Edit</button> <button class="delete-btn" onClick="deleteUser(event)">Delete</button> </td> 
+`;
+  return tableRow;
+}
+
+function deleteUser(event) {
+  const target = event.target;
+
+  const tableRow = target.parentElement.parentElement;
+  const userId = tableRow.getAttribute("user_id");
+  console.log("usere", userId);
+  removeUserFromLocalStorage(userId);
+  renderUsers();
+}
+
+function removeUserFromLocalStorage(deleteUser) {
+  const users = getFromLocalStorage("users");
+  const filteredUsers = users.filter(
+    (user) => user.user_id !== Number(deleteUser)
+  );
+
+  const newUsers = filteredUsers.map((user, index) => {
+    return {
+      ...user,
+      user_id: index,
+    };
+  });
+  console.log(newUsers);
+  localStorage.removeItem("users");
+  localStorage.setItem("users", JSON.stringify(newUsers));
 }
