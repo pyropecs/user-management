@@ -1,88 +1,96 @@
-html{
-    width:100%;
-    height:100%;
-    
+html {
+  width: 100%;
+  height: 100%;
 }
-body{
-    width:100%;
-    height:100%;
-    margin:0%;
-    padding: 0%;
-    font-family: sans-serif;
-   
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0%;
+  padding: 0%;
+  position: relative;
+  font-family: sans-serif;
 }
-.wrap{
-    width:100%;
-    height:100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
+.wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
-.create-form-container{
-    height:50%;
-    width:30%;
-   border:1px solid black;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.create-form-container {
+  height: 50%;
+  width: 30%;
+  border: 1px solid black;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.user-title{
-    margin:2%;
-    height:10%;
-    display: flex;
-    align-items: center;
+.user-title {
+  margin: 2%;
+  height: 10%;
+  display: flex;
+  align-items: center;
 }
-.user-form{
-    display: flex;
-    flex-direction: column;
-    width:60%;
-    height:90%;
-
-   
+.user-form {
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  height: 90%;
 }
-.input-container{
-    display: flex;
-    flex-direction: column;
-    padding-block: 2%;
+.input-container {
+  display: flex;
+  flex-direction: column;
+  padding-block: 2%;
 }
-input{
-    border:none;
-margin-bottom:1%;
-    border-radius: 12px;
-    border:1px solid gray;
-    margin-top: 0%;
+input {
+  border: none;
+  margin-bottom: 1%;
+  border-radius: 12px;
+  border: 1px solid gray;
+  margin-top: 0%;
 }
-input[type="text"]{
-    padding:5%;
-    outline:none;
-    font-size: 16px;
-}
-input[type="email"]{
-    padding:5%;
-    outline:none;
-    font-size: 16px;
-}
-.error{
-   color:red;
-    font-size: 12px;
-    font-weight: 400;
-}
-.hide{
-    display: none;
-}
-.add-btn{
-    width:100%;
+input[type="text"] {
+  padding: 5%;
+  outline: none;
   font-size: 16px;
-    padding:3%;
-    margin:2%;
-    align-self: center;
-    border:none;
-    background-color:black;
-    color:white;
-    font-weight: 600;
-    border-radius: 12px;
-    cursor: pointer;
+}
+input[type="email"] {
+  padding: 5%;
+  outline: none;
+  font-size: 16px;
+}
+.error {
+  color: red;
+  font-size: 12px;
+  font-weight: 400;
+}
+.hide {
+  display: none;
+}
+.add-btn {
+  width: 100%;
+  font-size: 16px;
+  padding: 3%;
+  margin: 2%;
+  align-self: center;
+  border: none;
+  background-color: black;
+  color: white;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.toast {
+  position: absolute;
+  bottom: 10%;
+  right: 2%;
+  width: 20%;
+  height:7%;
+  background-color: green;
+  display: flex;
+  justify-content: space-between;
 }

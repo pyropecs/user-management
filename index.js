@@ -38,7 +38,7 @@ createForm.addEventListener("submit", (e) => {
   const isValid = validateInputs(inputValues);
   if (isValid) {
     saveToLocalStorage("users", {
-      user_id: 0,
+      user_id: numberOfItemsLocalStorage("users"),
       username: userNameValue,
       email: emailValue,
       firstname: firstNameValue,
@@ -138,4 +138,13 @@ function saveToLocalStorage(key, object) {
   }
   const usersJSON = JSON.stringify(users);
   localStorage.setItem(key, usersJSON);
+}
+
+function numberOfItemsLocalStorage(key) {
+  let users = JSON.parse(localStorage.getItem(key));
+  if (users === null) {
+    return 0;
+  } else {
+    return users.length;
+  }
 }

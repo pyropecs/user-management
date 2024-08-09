@@ -351,6 +351,9 @@ describe("creation of user", () => {
     ]);
   });
 
+
+
+  
   test("invalid inputs should added in local storage when trying to add with invalid inputs", () => {
     const lastName = document.querySelector("#lastname-input");
 
@@ -382,4 +385,13 @@ describe("creation of user", () => {
 
     expect(localStorage.getItem("users")).toBeNull();
   });
+
+
+
+
 });
+
+
+
+
+
