@@ -1,7 +1,12 @@
 require("@testing-library/jest-dom");
 const fs = require("fs");
 const path = require("path");
-const { getByText, prettyDOM, waitFor } = require("@testing-library/dom");
+const {
+  getByText,
+  prettyDOM,
+  waitFor,
+  getByAltText,
+} = require("@testing-library/dom");
 const { userEvent } = require("@testing-library/user-event");
 const { Chance } = require("chance");
 const chance = new Chance();
@@ -351,9 +356,6 @@ describe("creation of user", () => {
     ]);
   });
 
-
-
-  
   test("invalid inputs should added in local storage when trying to add with invalid inputs", () => {
     const lastName = document.querySelector("#lastname-input");
 
@@ -385,13 +387,30 @@ describe("creation of user", () => {
 
     expect(localStorage.getItem("users")).toBeNull();
   });
-
-
-
-
 });
 
+describe("creation of sidebar", () => {
+  test("to check the title of the sidebar is present", () => {
+    const menuTitle = getByText(document.body, /Menu/);
+    expect(menuTitle).toBeInTheDocument();
+  });
 
+  test("to check that user management button is present", () => {
+    const userManagement = getByText(document.body, /User management/);
+    expect(userManagement).toBeInTheDocument();
+  });
 
+  test("to check that group management button is present", () => {
+    const groupManagement = getByText(document.body, /Group management/);
+    expect(groupManagement).toBeInTheDocument();
+  });
 
-
+  test("to check that group management button is present", () => {
+    const roleManagement = getByText(document.body, /Role management/);
+    expect(roleManagement).toBeInTheDocument();
+  });
+  test("to check that hamburger bar is present", () => {
+    const hamburgerMenu = getByAltText(document.body, /menu bar/);
+    expect(hamburgerMenu).toBeInTheDocument();
+  });
+});
