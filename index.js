@@ -209,8 +209,10 @@ function createTableRow(user) {
 <td>${firstname}</td>
 <td>${lastname}</td>
 <td>${email}</td>
-<td> <button class="edit-btn" onClick="editUser()" >Edit</button> <button class="delete-btn" onClick="deleteUser(event)">Delete</button> </td> 
+<td> <button class="edit-btn" onClick="editUser()" >Edit</button> <button class="delete-btn"  >Delete</button> </td> 
 `;
+  const deleteBtn = tableRow.querySelector(".delete-btn");
+  deleteBtn.addEventListener("click", deleteUser);
   return tableRow;
 }
 

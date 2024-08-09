@@ -8,6 +8,7 @@ const {
   getByAltText,
   prettyDOM,
   queryByText,
+  fireEvent,
 } = require("@testing-library/dom");
 const { userEvent } = require("@testing-library/user-event");
 const { Chance } = require("chance");
@@ -521,8 +522,8 @@ describe("the user management", () => {
     const deleteBtn = getByText(tableRow, /Delete/);
     expect(tableRow.getAttribute("user_id")).toBe("0")
     expect(deleteBtn).toBeInTheDocument();
-    deleteBtn.click();
-    lastName = queryByText(tableRow, userDetails.username);
+    fireEvent.click(deleteBtn)
+    console.log(prettyDOM(tableRow))
     // expect(lastName).toBeNull();
   });
 });
