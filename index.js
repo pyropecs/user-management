@@ -8,6 +8,10 @@ const firstNameError = document.querySelector("#firstname-error");
 const lastName = document.querySelector("#lastname-input");
 const lastNameError = document.querySelector("#lastname-error");
 const submitButton = document.querySelector("#submit-btn");
+const toggleBtnId = document.querySelector("#toggle-btn-id");
+const addUserBtn = document.querySelector("#create-btn-id");
+const modalWrap = document.querySelector(".wrap");
+toggleBtnId.addEventListener("click", toggleNav);
 
 userName.addEventListener("input", () => {
   userNameError.textContent = "";
@@ -22,7 +26,18 @@ firstName.addEventListener("input", () => {
 lastName.addEventListener("input", () => {
   lastNameError.textContent = "";
 });
+addUserBtn.addEventListener("click", () => {
+  if (modalWrap.classList.contains("hide")) {
+    modalWrap.classList.remove("hide");
+  } else modalWrap.classList.add("hide");
+});
+window.addEventListener("mouseup", (event) => {
+  const formContainer = document.querySelector(".create-form-container");
 
+  if (!formContainer.contains(event.target)) {
+    modalWrap.classList.add("hide")
+}
+});
 createForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const userNameValue = userName.value;
@@ -146,5 +161,13 @@ function numberOfItemsLocalStorage(key) {
     return 0;
   } else {
     return users.length;
+  }
+}
+function toggleNav() {
+  const sidebar = document.getElementById("mySidebar");
+  const main = document.getElementById("main");
+  sidebar.classList.toggle("closed");
+  if (window.innerWidth <= 768) {
+    sidebar.classList.toggle("open");
   }
 }

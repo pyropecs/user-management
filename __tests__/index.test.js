@@ -6,6 +6,7 @@ const {
   prettyDOM,
   waitFor,
   getByAltText,
+  getByRole,
 } = require("@testing-library/dom");
 const { userEvent } = require("@testing-library/user-event");
 const { Chance } = require("chance");
@@ -409,8 +410,48 @@ describe("creation of sidebar", () => {
     const roleManagement = getByText(document.body, /Role management/);
     expect(roleManagement).toBeInTheDocument();
   });
-  test("to check that hamburger bar is present", () => {
+  test("to check that hamburger icon is present", () => {
     const hamburgerMenu = getByAltText(document.body, /menu bar/);
     expect(hamburgerMenu).toBeInTheDocument();
   });
+  test("to check that user management icon is present", () => {
+    const userManagement = getByAltText(document.body, /user management/);
+    expect(userManagement).toBeInTheDocument();
+  });
+  test("to check that role management icon is present", () => {
+    const roleManagement = getByAltText(document.body, /role management/);
+    expect(roleManagement).toBeInTheDocument();
+  });
+  test("to check that group management icon is present", () => {
+    const groupManagement = getByAltText(document.body, /group management/);
+    expect(groupManagement).toBeInTheDocument();
+  });
+});
+
+describe("the user management", () => {
+  test("the title should be present in the user management tab", () => {
+    const userManagementTitle = getByText(
+      document.body,
+      /User Management System/
+    );
+    expect(userManagementTitle).toBeInTheDocument();
+  });
+
+  test("the create user button should be present in the user management tab", () => {
+    const addUserBtn = document.querySelector("#create-btn-id");
+    expect(addUserBtn.textContent).toBe("New User");
+    expect(addUserBtn).not.toBeNull();
+  });
+  test("without clicking new button the modal shpuld be hidden", () => {
+    const modalWrap = document.querySelector(".wrap");
+    expect(modalWrap.classList.contains("hide")).toBeTruthy();
+  });
+
+  test("when clicking new user button the modal should be displayed", () => {
+    const newUserBtn = document.querySelector("#create-btn-id");
+    newUserBtn.click();
+    const modalWrap = document.querySelector(".wrap");
+    expect(modalWrap.classList.contains("hide")).toBeFalsy();
+  });
+
 });

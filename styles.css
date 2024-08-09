@@ -13,16 +13,19 @@ body {
 .wrap {
   width: 100%;
   height: 100%;
+  top: 0%;
   display: flex;
   align-items: center;
   justify-content: center;
+  position:absolute;
   box-sizing: border-box;
+  background: rgba(0,0,0,.8);
 }
 
 .create-form-container {
   height: 50%;
   width: 30%;
-  border: 1px solid black;
+  background: white;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -95,6 +98,8 @@ input[type="email"] {
   justify-content: space-between;
 }
 
+
+
 :root {
     --primary-color: #4a90e2;
     --bg-color: #f4f7fa;
@@ -107,7 +112,7 @@ input[type="email"] {
     height: 100%;
     width: 250px;
     position: fixed;
-    z-index: 1;
+   
     top: 0;
     left: 0;
     background-color: var(--sidebar-bg);
@@ -152,9 +157,11 @@ input[type="email"] {
     background-color: var(--sidebar-hover);
     color: var(--primary-color);
 }
-.sidebar a i {
-    min-width: 30px;
-    font-size: 20px;
+.sidebar a img {
+ width:25px;
+}
+.sidebar a span {
+    padding-inline: 10px;
 }
 #main {
     transition: margin-left .3s;
@@ -198,4 +205,66 @@ input[type="email"] {
     .sidebar.open ~ #main {
         margin-left: 250px;
     }
+}
+
+
+
+
+
+/* CSS */
+.button-container{
+    width:94%;
+    display: flex;
+   justify-content: flex-end;
+ padding:3%;
+}
+.create-btn {
+  appearance: none;
+  background-color: #2ea44f;
+  border: 1px solid rgba(27, 31, 35, .15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 6px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.create-btn:focus:not(:focus-visible):not(.focus-visible) {
+  box-shadow: none;
+  outline: none;
+}
+
+.create-btn:hover {
+  background-color: #2c974b;
+}
+
+.create-btn:focus {
+  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
+  outline: none;
+}
+
+.create-btn:disabled {
+  background-color: #94d3a2;
+  border-color: rgba(27, 31, 35, .1);
+  color: rgba(255, 255, 255, .8);
+  cursor: default;
+}
+
+.create-btn:active {
+  background-color: #298e46;
+  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
 }

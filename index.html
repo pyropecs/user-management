@@ -10,23 +10,34 @@
     <div id="mySidebar" class="sidebar">
       <div class="sidebar-header">
         <h3>Menu</h3>
-        <button class="toggle-btn">
+        <button class="toggle-btn" id="toggle-btn-id">
           <img src="./Images/menu.png" width="20px" alt="menu bar" />
         </button>
       </div>
-      <a href="#"> <span>User management</span></a>
-      <a href="#"><span>Group management</span></a>
-      <a href="#"> <span>Role management</span></a>
+      <a href="#main">
+        <img src="./Images/user.png" alt="user management" />
+        <span>User management</span></a
+      >
+      <a href="#apple">
+        <img src="./Images/income.png" alt="group management" />
+        <span>Group management</span></a
+      >
+      <a href="good">
+        <img src="./Images/computer.png"  alt="role management" srcset="" />
+        <span>Role management</span></a
+      >
     </div>
-
     <div id="main">
-      <h2>Modern Sidebar with Internal Toggle</h2>
-      <p>
-        The toggle button is inside the sidebar at the top. Click it to expand
-        or collapse the sidebar.
-      </p>
-    </div>
-    <!-- <div class="wrap">
+      <h2>User Management System</h2>
+      <div class="button-container">
+        <button id="create-btn-id" class="create-btn">New User</button>
+      </div>
+      
+  </div>
+
+
+
+    <div class="wrap hide">
       <div class="create-form-container">
         <h1 class="user-title">Create User</h1>
         <form id="submit-form" class="user-form">
@@ -76,7 +87,7 @@
           </button>
         </form>
       </div>
-    </div> -->
+    </div>
 
     <script src="./index.js"></script>
   </body>
