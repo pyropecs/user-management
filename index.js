@@ -9,6 +9,20 @@ const lastName = document.querySelector("#lastname-input");
 const lastNameError = document.querySelector("#lastname-error");
 const submitButton = document.querySelector("#submit-btn");
 
+userName.addEventListener("input", () => {
+  userNameError.textContent = "";
+});
+
+email.addEventListener("input", () => {
+  emailError.textContent = "";
+});
+firstName.addEventListener("input", () => {
+  firstNameError.textContent = "";
+});
+lastName.addEventListener("input", () => {
+  lastNameError.textContent = "";
+});
+
 createForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const userNameValue = userName.value;
@@ -21,7 +35,16 @@ createForm.addEventListener("submit", (e) => {
     firstNameValue,
     lastNameValue,
   };
-  validateInputs(inputValues);
+  const isValid = validateInputs(inputValues);
+  if (isValid) {
+    saveToLocalStorage("users", {
+      user_id: 0,
+      username: userNameValue,
+      email: emailValue,
+      firstname: firstNameValue,
+      lastname: lastNameValue,
+    });
+  }
 });
 
 function validateInputs({
@@ -30,12 +53,13 @@ function validateInputs({
   firstNameValue,
   lastNameValue,
 }) {
-  validateUserName(userNameValue);
-  validateEmail(emailValue);
-  validateFirstName(firstNameValue);
-  validateLastName(lastNameValue);
+  let isValid;
+  isValid = validateUserName(userNameValue);
+  isValid = validateEmail(emailValue);
+  isValid = validateFirstName(firstNameValue);
+  isValid = validateLastName(lastNameValue);
 
-  return true;
+  return isValid;
 }
 function validateEmail(emailValue) {
   if (emailValue === "") {
@@ -50,7 +74,7 @@ function validateEmail(emailValue) {
     addError(emailError);
     return false;
   }
-  return true
+  return true;
 }
 
 function validateFirstName(firstNameValue) {
@@ -65,6 +89,7 @@ function validateFirstName(firstNameValue) {
     addError(firstNameError);
     return false;
   }
+  return true;
 }
 
 function validateLastName(lastNameValue) {
@@ -79,6 +104,7 @@ function validateLastName(lastNameValue) {
     addError(lastNameError);
     return false;
   }
+  return true;
 }
 
 function validateUserName(userNameValue) {
@@ -94,10 +120,22 @@ function validateUserName(userNameValue) {
     addError(userNameError);
     return false;
   }
+  return true;
 }
 
 function addError(container) {
   if (container.classList.contains("hide")) {
     container.classList.remove("hide");
   }
+}
+
+function saveToLocalStorage(key, object) {
+  let users = JSON.parse(localStorage.getItem(key));
+  if (users === null) {
+    users = [object];
+  } else {
+    users.push(object);
+  }
+  const usersJSON = JSON.stringify(users);
+  localStorage.setItem(key, usersJSON);
 }
