@@ -10,6 +10,7 @@ const {
   queryByText,
   fireEvent,
   getByPlaceholderText,
+  getByRole,
 } = require("@testing-library/dom");
 const { userEvent } = require("@testing-library/user-event");
 const { Chance } = require("chance");
@@ -534,7 +535,7 @@ describe("sidebar functioanlity", () => {
     const groupManagementBtn = document.querySelector("#group-management-btn");
     groupManagementBtn.click();
     const userManagementPage = document.querySelector("#user-management-page");
-    expect(userManagementPage.classList.contains("hide")).toBeTruthy()
+    expect(userManagementPage.classList.contains("hide")).toBeTruthy();
     const groupManagementPage = document.querySelector(
       "#group-management-page"
     );
@@ -544,35 +545,64 @@ describe("sidebar functioanlity", () => {
 
 describe("group managment ", () => {
   test("to check that all elements are displayed in the group management", () => {
-    const userManagementTitle = getByText(
+    const groupManagementTitle = getByText(
       document.body,
       /Group Management System/
     );
-    expect(userManagementTitle).toBeInTheDocument();
+    const groupManagementPage = document.querySelector(
+      "#group-management-page"
+    );
+    expect(groupManagementTitle).toBeInTheDocument();
     const newGroupBtn = document.querySelector("#create-group-btn-id");
-    expect(newGroupBtn.disabled).toBeFalsy()
+    expect(newGroupBtn.disabled).toBeFalsy();
     expect(newGroupBtn.textContent).toBe("New Group");
     expect(newGroupBtn).not.toBeNull();
+    const groupTableId = getByText(groupManagementPage, /Group Id/);
+    expect(groupTableId).toBeInTheDocument();
+    const groupTableName = getByText(groupManagementPage, /Group Name/);
+    expect(groupTableName).toBeInTheDocument();
+    const groupTableActions = getByText(groupManagementPage, /Actions/);
+    expect(groupTableActions).toBeInTheDocument();
   });
   test("to check that clicking new group button should open the modal", () => {
     const newGroupBtn = document.querySelector("#create-group-btn-id");
-    
+
     fireEvent(newGroupBtn, new Event("click"));
 
     const modalWrap = document.querySelector("#group-form");
     expect(modalWrap.classList.contains("hide")).toBeFalsy();
   });
 
-test("to check that create Group contains necessary components in it",()=>{
-  const groupForm = document.querySelector("#group-form");
-  const createGroupTitle = getByText(groupForm,/Create Group/)
-  expect(createGroupTitle).toBeInTheDocument()
-  const inputform = getByPlaceholderText(groupForm,/Group Name/)
-  expect(inputform).toBeInTheDocument();
-  const createGroupBtn = document.querySelector("#submit-group-btn")
-  expect(createGroupBtn.disabled).toBeFalsy()
-  expect(createGroupBtn).toBeInTheDocument()
+  test("to check that create Group contains necessary components in it", () => {
+    const groupForm = document.querySelector("#group-form");
+    const createGroupTitle = getByText(groupForm, /Create Group/);
+    expect(createGroupTitle).toBeInTheDocument();
+    const inputform = getByPlaceholderText(groupForm, /Group Name/);
+    expect(inputform).toBeInTheDocument();
+    const createGroupBtn = document.querySelector("#submit-group-btn");
+    expect(createGroupBtn.disabled).toBeFalsy();
+    expect(createGroupBtn).toBeInTheDocument();
+  });
+});
 
-})
+describe("role management", () => {
+  test("to check that from user management button clicking role management button will go to the role management page", () => {
+    const roleManagementBtn = document.querySelector("#role-management-btn");
+    roleManagementBtn.click();
+    const userManagementPage = document.querySelector("#user-management-page");
+    expect(userManagementPage.classList.contains("hide")).toBeTruthy();
+    const roleManagementPage = document.querySelector("#role-management-page");
+    expect(roleManagementPage.classList.contains("hide")).toBeFalsy();
+  });
 
+  test("to check that all elements are present in this role management page", () => {
+    const roleManagementPage = document.querySelector("#role-management-page");
+    const roleManagementTitle = getByText(
+      roleManagementPage,
+      /Role Management System/
+    );
+    expect(roleManagementTitle).toBeInTheDocument();
+    const newRoleButton = getByRole(roleManagementPage, "button");
+    expect(newRoleButton.textContent).toBe("New Role");
+  });
 });

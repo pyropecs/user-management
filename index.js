@@ -15,19 +15,28 @@ const createGroupBtn = document.querySelector("#create-group-btn-id");
 const groupForm = document.querySelector("#group-form")
 const groupManagementBtn = document.querySelector("#group-management-btn");
 const userManagementBtn = document.querySelector("#user-management-btn");
-const roleManagementBtn = document.querySelector("#group-management-btn");
+const roleManagementBtn = document.querySelector("#role-management-btn");
 const userManagementPage = document.querySelector("#user-management-page");
 const groupManagementPage = document.querySelector("#group-management-page");
+const roleManagementPage = document.querySelector("#role-management-page");
 toggleBtnId.addEventListener("click", toggleNav);
 window.addEventListener("DOMContentLoaded", renderUsers);
 userManagementBtn.addEventListener("click", () => {
   userManagementPage.classList.remove("hide");
   groupManagementPage.classList.add("hide");
+  roleManagementPage.classList.add("hide")
 });
 groupManagementBtn.addEventListener("click", () => {
   userManagementPage.classList.add("hide");
   groupManagementPage.classList.remove("hide");
+  roleManagementPage.classList.add("hide")
 });
+roleManagementBtn.addEventListener("click", () => {
+  userManagementPage.classList.add("hide");
+  groupManagementPage.classList.add("hide");
+  roleManagementPage.classList.remove("hide");
+});
+
 
 createGroupBtn.addEventListener("click",()=>{
 groupForm.classList.remove("hide");
