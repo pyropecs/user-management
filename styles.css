@@ -166,7 +166,7 @@ input[type="email"] {
 .sidebar a span {
     padding-inline: 10px;
 }
-#main {
+.main {
     transition: margin-left .3s;
     height: 100%;
     margin-left: 250px;

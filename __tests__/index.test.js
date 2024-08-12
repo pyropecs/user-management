@@ -9,6 +9,7 @@ const {
   prettyDOM,
   queryByText,
   fireEvent,
+  getByPlaceholderText,
 } = require("@testing-library/dom");
 const { userEvent } = require("@testing-library/user-event");
 const { Chance } = require("chance");
@@ -520,10 +521,58 @@ describe("the user management", () => {
     let lastName = getByText(userTable, userDetails.lastName);
     const tableRow = lastName.parentElement;
     const deleteBtn = getByText(tableRow, /Delete/);
-    expect(tableRow.getAttribute("user_id")).toBe("0")
+    expect(tableRow.getAttribute("user_id")).toBe("0");
     expect(deleteBtn).toBeInTheDocument();
-    fireEvent.click(deleteBtn)
-    console.log(prettyDOM(tableRow))
+    fireEvent.click(deleteBtn);
+    console.log(prettyDOM(tableRow));
     // expect(lastName).toBeNull();
   });
+});
+
+describe("sidebar functioanlity", () => {
+  test("to check that clicking group management from user management should show the group management tab", () => {
+    const groupManagementBtn = document.querySelector("#group-management-btn");
+    groupManagementBtn.click();
+    const userManagementPage = document.querySelector("#user-management-page");
+    expect(userManagementPage.classList.contains("hide")).toBeTruthy()
+    const groupManagementPage = document.querySelector(
+      "#group-management-page"
+    );
+    expect(groupManagementPage.classList.contains("hide")).toBeFalsy();
+  });
+});
+
+describe("group managment ", () => {
+  test("to check that all elements are displayed in the group management", () => {
+    const userManagementTitle = getByText(
+      document.body,
+      /Group Management System/
+    );
+    expect(userManagementTitle).toBeInTheDocument();
+    const newGroupBtn = document.querySelector("#create-group-btn-id");
+    expect(newGroupBtn.disabled).toBeFalsy()
+    expect(newGroupBtn.textContent).toBe("New Group");
+    expect(newGroupBtn).not.toBeNull();
+  });
+  test("to check that clicking new group button should open the modal", () => {
+    const newGroupBtn = document.querySelector("#create-group-btn-id");
+    
+    fireEvent(newGroupBtn, new Event("click"));
+
+    const modalWrap = document.querySelector("#group-form");
+    expect(modalWrap.classList.contains("hide")).toBeFalsy();
+  });
+
+test("to check that create Group contains necessary components in it",()=>{
+  const groupForm = document.querySelector("#group-form");
+  const createGroupTitle = getByText(groupForm,/Create Group/)
+  expect(createGroupTitle).toBeInTheDocument()
+  const inputform = getByPlaceholderText(groupForm,/Group Name/)
+  expect(inputform).toBeInTheDocument();
+  const createGroupBtn = document.querySelector("#submit-group-btn")
+  expect(createGroupBtn.disabled).toBeFalsy()
+  expect(createGroupBtn).toBeInTheDocument()
+
+})
+
 });

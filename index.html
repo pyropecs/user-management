@@ -14,27 +14,27 @@
           <img src="./Images/menu.png" width="20px" alt="menu bar" />
         </button>
       </div>
-      <a href="#main">
+      <a href="#" id="user-management-btn">
         <img src="./Images/user.png" alt="user management" />
         <span>User management</span></a
       >
-      <a href="#apple">
+      <a href="#" id="group-management-btn">
         <img src="./Images/income.png" alt="group management" />
         <span>Group management</span></a
       >
-      <a href="good">
+      <a href="#" id="role-management-btn">
         <img src="./Images/computer.png" alt="role management" srcset="" />
         <span>Role management</span></a
       >
     </div>
-    <div id="main">
+    <div id="user-management-page" class="main">
       <h2 class="title">User Management System</h2>
       <div class="button-container">
         <button id="create-btn-id" class="create-btn">New User</button>
       </div>
       <table class="user-table" id="user-table-id">
         <thead class="table-header">
-          <tr >
+          <tr>
             <th>User Id</th>
             <th>Username</th>
             <th>Email</th>
@@ -43,17 +43,27 @@
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody class="user-table-body" id="table-body">
-      
- 
-        </tbody>
-   
-
-
+        <tbody class="user-table-body" id="table-body"></tbody>
+      </table>
+    </div>
+    <div id="group-management-page" class="main hide">
+      <h2 class="title">Group Management System</h2>
+      <div class="button-container">
+        <button id="create-group-btn-id" class="create-btn">New Group</button>
+      </div>
+      <table class="user-table" id="user-table-id">
+        <thead class="table-header">
+          <tr>
+            <th>Group Id</th>
+            <th>Group Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody class="user-table-body" id="table-body"></tbody>
       </table>
     </div>
 
-    <div class="wrap hide">
+    <div class="wrap hide" id="user-form">
       <div class="create-form-container">
         <h1 class="user-title">Create User</h1>
         <form id="submit-form" class="user-form">
@@ -100,6 +110,27 @@
 
           <button type="submit" class="add-btn" id="submit-btn">
             Add User
+          </button>
+        </form>
+      </div>
+    </div>
+    <div class="wrap hide" id="group-form">
+      <div class="create-form-container"  id="create-group-form-container">
+        <h1 class="group-title">Create Group</h1>
+        <form id="submit-form" class="user-form">
+          <div class="input-container">
+            <input
+              type="text"
+              name="user-name"
+              placeholder="Group Name"
+              title="user name"
+              id="groupname-input"
+            />
+            <span class="error hide" id="username-error"></span>
+          </div>
+         
+          <button type="submit" class="add-btn" id="submit-group-btn">
+            Add group
           </button>
         </form>
       </div>
