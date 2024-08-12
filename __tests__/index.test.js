@@ -638,15 +638,16 @@ describe("user edit functionality", () => {
       email: chance.email(),
       username: chance.string({ symbols: false, numeric: true, alpha: true }),
     };
-
     document.querySelector("#lastname-input").value = newUserDetails.lastName;
     document.querySelector("#firstname-input").value = newUserDetails.firstName;
     document.querySelector("#email-input").value = newUserDetails.email;
     document.querySelector("#username-input").value = newUserDetails.username;
-
-    const editUser = document.querySelector("#submit-btn");
-
+    let editUser = document.querySelector("#submit-btn");
     fireEvent.click(editUser);
+    editUser = document.querySelector("#submit-btn");
+    expect(editUser.textContent).toBe("Add User")
+    const userTitle = document.querySelector("#user-title-id");
+    expect(userTitle.textContent).toBe("Create User");
     const newItem = JSON.parse(localStorage.getItem("users"))[0];
     expect(oldItem).not.toStrictEqual(newItem);
     expect(newItem.lastname).toBe(newUserDetails.lastName);

@@ -108,7 +108,7 @@ function submitEditForm(isValid, inputValues) {
       lastname: inputValues.lastNameValue,
     };
     updateTodotoLocalStorage(updatedUser, "users");
-    showSuccess();
+    showSuccess("User Edited successfully");
     renderUsers();
     userName.value = "";
     email.value = "";
@@ -125,18 +125,19 @@ function submitEditForm(isValid, inputValues) {
 function createSubmitForm(isValid, inputValues) {
   if (isValid) {
     saveToLocalStorage("users", {
-      user_id: numberOfItemsLocalStorage("users"),
+      user_id: getIndexFromLocalStorage("users"),
       username: inputValues.userNameValue,
       email: inputValues.emailValue,
       firstname: inputValues.firstNameValue,
       lastname: inputValues.lastNameValue,
     });
-    showSuccess();
+    showSuccess("User Added Successfully");
     renderUsers();
     userName.value = "";
     email.value = "";
     firstName.value = "";
     lastName.value = "";
+    modalWrap.classList.add("hide");
   }
 }
 
@@ -241,12 +242,13 @@ function getFromLocalStorage(key) {
   }
 }
 
-function numberOfItemsLocalStorage(key) {
+function getIndexFromLocalStorage(key) {
   let users = JSON.parse(localStorage.getItem(key));
   if (users === null) {
     return 0;
   } else {
-    return users.length;
+    const lastIndex = users[users.length - 1].user_id
+    return lastIndex + 1;
   }
 }
 function toggleNav() {
@@ -347,15 +349,9 @@ function removeUserFromLocalStorage(deleteUser) {
     (user) => user.user_id !== Number(deleteUser)
   );
 
-  const newUsers = filteredUsers.map((user, index) => {
-    return {
-      ...user,
-      user_id: index,
-    };
-  });
 
   localStorage.removeItem("users");
-  localStorage.setItem("users", JSON.stringify(newUsers));
+  localStorage.setItem("users", JSON.stringify(filteredUsers));
 }
 function updateTodotoLocalStorage(item, key) {
   const items = JSON.parse(localStorage.getItem(key));
@@ -385,9 +381,10 @@ function updateItem(items, item) {
   }
 }
 
-function showSuccess() {
+function showSuccess(message) {
   successMsg.classList.remove("hide");
-
+const successMessage = document.querySelector("#show-success-id span")
+successMessage.textContent = message
   setTimeout(() => {
     successMsg.classList.add("hide");
   }, 3000);
