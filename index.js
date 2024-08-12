@@ -20,6 +20,7 @@ const userManagementPage = document.querySelector("#user-management-page");
 const groupManagementPage = document.querySelector("#group-management-page");
 const roleManagementPage = document.querySelector("#role-management-page");
 const successMsg = document.querySelector("#show-success-id");
+const userTitle = document.querySelector("#user-title-id");
 toggleBtnId.addEventListener("click", toggleNav);
 window.addEventListener("DOMContentLoaded", renderUsers);
 userManagementBtn.addEventListener("click", () => {
@@ -69,7 +70,7 @@ window.addEventListener("mouseup", (event) => {
 });
 window.addEventListener("mouseup", (event) => {
   const formContainer = document.querySelector("#create-group-form-container");
-  console.log(event.target);
+
   if (!formContainer.contains(event.target)) {
     groupForm.classList.add("hide");
   }
@@ -87,23 +88,57 @@ createForm.addEventListener("submit", (e) => {
     lastNameValue,
   };
   const isValid = validateInputs(inputValues);
-  console.log(isValid);
+  const isEdit = modalWrap.getAttribute("isEdit");
+
+  if (isEdit === "true") {
+    submitEditForm(isValid, inputValues);
+  } else {
+    createSubmitForm(isValid, inputValues);
+  }
+});
+
+function submitEditForm(isValid, inputValues) {
+  const editIndex = modalWrap.getAttribute("editIndex");
+  if (isValid) {
+    const updatedUser = {
+      user_id: Number(editIndex),
+      username: inputValues.userNameValue,
+      email: inputValues.emailValue,
+      firstname: inputValues.firstNameValue,
+      lastname: inputValues.lastNameValue,
+    };
+    updateTodotoLocalStorage(updatedUser, "users");
+    showSuccess();
+    renderUsers();
+    userName.value = "";
+    email.value = "";
+    firstName.value = "";
+    lastName.value = "";
+    modalWrap.removeAttribute("isEdit");
+    modalWrap.removeAttribute("editIndex");
+    modalWrap.classList.add("hide");
+    userTitle.textContent = "Create User";
+    submitButton.textContent = "Add User";
+  }
+}
+
+function createSubmitForm(isValid, inputValues) {
   if (isValid) {
     saveToLocalStorage("users", {
       user_id: numberOfItemsLocalStorage("users"),
-      username: userNameValue,
-      email: emailValue,
-      firstname: firstNameValue,
-      lastname: lastNameValue,
+      username: inputValues.userNameValue,
+      email: inputValues.emailValue,
+      firstname: inputValues.firstNameValue,
+      lastname: inputValues.lastNameValue,
     });
-    showSuccess()
+    showSuccess();
     renderUsers();
     userName.value = "";
     email.value = "";
     firstName.value = "";
     lastName.value = "";
   }
-});
+}
 
 function validateInputs({
   userNameValue,
@@ -246,11 +281,33 @@ function createTableRow(user) {
 <td>${firstname}</td>
 <td>${lastname}</td>
 <td>${email}</td>
-<td> <button class="edit-btn" onClick="editUser()" >Edit</button> <button class="delete-btn"  >Delete</button> </td> 
+<td> <button class="edit-btn"  >Edit</button> <button class="delete-btn"  >Delete</button> </td> 
 `;
   const deleteBtn = tableRow.querySelector(".delete-btn");
+  const editBtn = tableRow.querySelector(".edit-btn");
   deleteBtn.addEventListener("click", deleteUser);
+  editBtn.addEventListener("click", editUser);
   return tableRow;
+}
+
+function editUser(event) {
+  const target = event.target;
+  const userRow = target.parentElement.parentElement;
+  const userId = userRow.getAttribute("user_id");
+  modalWrap.classList.remove("hide");
+  modalWrap.setAttribute("editIndex", userId);
+  modalWrap.setAttribute("isEdit", "true");
+  userTitle.textContent = "Edit User";
+  submitButton.textContent = "Edit User";
+  try {
+    const item = getItemFromLocalStorageUsingIndex(userId, "users");
+    userName.value = item.username;
+    lastName.value = item.lastname;
+    firstName.value = item.firstname;
+    email.value = item.email;
+  } catch (err) {
+    console.error(err.message);
+  }
 }
 
 function deleteUser(event) {
@@ -258,9 +315,30 @@ function deleteUser(event) {
 
   const tableRow = target.parentElement.parentElement;
   const userId = tableRow.getAttribute("user_id");
-  console.log("usere", userId);
+
   removeUserFromLocalStorage(userId);
   renderUsers();
+}
+
+function getItemFromLocalStorageUsingIndex(index, key) {
+  const items = getFromLocalStorage(key);
+
+  const isTaskExist = checkItemExist(items, Number(index));
+  if (isTaskExist) {
+    const [item] = items.filter((item) => item.user_id === Number(index));
+    return item;
+  } else {
+    throw new Error("the given task didnt exist");
+  }
+}
+function checkItemExist(items, index) {
+  const number = items.findIndex((item) => index === item.user_id);
+
+  if (number >= 0) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 function removeUserFromLocalStorage(deleteUser) {
@@ -275,16 +353,42 @@ function removeUserFromLocalStorage(deleteUser) {
       user_id: index,
     };
   });
-  console.log(newUsers);
+
   localStorage.removeItem("users");
   localStorage.setItem("users", JSON.stringify(newUsers));
 }
+function updateTodotoLocalStorage(item, key) {
+  const items = JSON.parse(localStorage.getItem(key));
+  try {
+    const updatedItems = updateItem(items, item);
+    localStorage.removeItem(key);
+    localStorage.setItem(key, JSON.stringify(updatedItems));
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+function updateItem(items, item) {
+  const isTaskExist = checkItemExist(items, Number(item.user_id));
+  if (isTaskExist) {
+    const newItems = items.map((renderItem) => {
+      if (renderItem.user_id === Number(item.user_id)) {
+        renderItem.username = item.username;
+        renderItem.lastname = item.lastname;
+        renderItem.firstname = item.firstname;
+        renderItem.email = item.email;
+      }
+      return renderItem;
+    });
+    return newItems;
+  } else {
+    throw new Error("the given task doesnt exist");
+  }
+}
 
-function showSuccess(){
-successMsg.classList.remove("hide")
+function showSuccess() {
+  successMsg.classList.remove("hide");
 
-setTimeout(()=>{
-successMsg.classList.add("hide")
-},3000)
-
+  setTimeout(() => {
+    successMsg.classList.add("hide");
+  }, 3000);
 }

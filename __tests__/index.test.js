@@ -23,6 +23,7 @@ beforeEach(() => {
   document.documentElement.innerHTML = html.toString();
   require("../index.js");
   jest.resetModules();
+
   const mockLocalStorage = (() => {
     let store = {};
     return {
@@ -547,6 +548,116 @@ describe("the user management", () => {
     fireEvent.click(deleteBtn);
     lastName = queryByText(userTable, userDetails.lastName);
     expect(lastName).toBeNull();
+  });
+});
+
+describe("user edit functionality", () => {
+  function createUser(userDetails) {
+    const lastName = document.querySelector("#lastname-input");
+
+    const lastNameValue = userDetails.lastName;
+    lastName.value = lastNameValue;
+    const firstName = document.querySelector("#firstname-input");
+    const firstNameValue = userDetails.firstName;
+    firstName.value = firstNameValue;
+    const email = document.querySelector("#email-input");
+    const emailValue = userDetails.email;
+    email.value = emailValue;
+    const userName = document.querySelector("#username-input");
+    const userNameValue = userDetails.username;
+    userName.value = userNameValue;
+    const addUser = getByText(document.body, /Add User/);
+    addUser.click();
+  }
+  const userDetails = {
+    lastName: chance.string({ symbols: false, numeric: false, alpha: true }),
+    firstName: chance.string({ symbols: false, numeric: false, alpha: true }),
+    email: chance.email(),
+    username: chance.string({ symbols: false, numeric: true, alpha: true }),
+  };
+  beforeEach(() => {
+    createUser(userDetails);
+  });
+
+  test("to test that clicking edit button should open the modal", () => {
+    const userTable = document.querySelector("#user-table-id");
+    let email = getByText(userTable, userDetails.lastName);
+    const tableRow = email.parentElement;
+    const editBtn = getByText(tableRow, /Edit/);
+    expect(editBtn.disabled).toBeFalsy();
+
+    fireEvent.click(editBtn);
+    const modalWrap = document.querySelector(".wrap");
+    expect(modalWrap.classList.contains("hide")).toBeFalsy();
+  });
+
+  test("to check that clicking edit button will pop up the modal", () => {
+    const userTable = document.querySelector("#user-table-id");
+    let email = getByText(userTable, userDetails.lastName);
+    const tableRow = email.parentElement;
+    const editBtn = getByText(tableRow, /Edit/);
+    expect(editBtn.disabled).toBeFalsy();
+    fireEvent.click(editBtn);
+    const modalWrap = document.querySelector(".wrap");
+    expect(modalWrap.classList.contains("hide")).toBeFalsy();
+    const userTitle = document.querySelector("#user-title-id");
+    expect(userTitle.textContent).toBe("Edit User");
+    const submitBtn = document.querySelector("#submit-btn");
+    expect(submitBtn.textContent).toBe("Edit User");
+    expect(modalWrap).toHaveAttribute("isEdit", "true");
+    expect(modalWrap).toHaveAttribute("editIndex", "0");
+  });
+  test("to check that click edit will have the current inputs in the edit form", () => {
+    const userTable = document.querySelector("#user-table-id");
+    let email = getByText(userTable, userDetails.lastName);
+    const tableRow = email.parentElement;
+    const editBtn = getByText(tableRow, /Edit/);
+    expect(editBtn.disabled).toBeFalsy();
+    fireEvent.click(editBtn);
+    const lastNameValue = document.querySelector("#lastname-input").value;
+    const firstNameValue = document.querySelector("#firstname-input").value;
+    const emailValue = document.querySelector("#email-input").value;
+    const userNameValue = document.querySelector("#username-input").value;
+    expect(lastNameValue).toBe(userDetails.lastName);
+    expect(firstNameValue).toBe(userDetails.firstName);
+    expect(emailValue).toBe(userDetails.email);
+    expect(userNameValue).toBe(userDetails.username);
+  });
+
+  test("to check that after submit the edit form it should be updated in the local storage also display in the document", () => {
+    const userTable = document.querySelector("#user-table-id");
+    let email = getByText(userTable, userDetails.lastName);
+    const tableRow = email.parentElement;
+    const editBtn = getByText(tableRow, /Edit/);
+    expect(editBtn.disabled).toBeFalsy();
+    fireEvent.click(editBtn);
+    const oldItem = JSON.parse(localStorage.getItem("users"))[0];
+    const newUserDetails = {
+      lastName: chance.string({ symbols: false, numeric: false, alpha: true }),
+      firstName: chance.string({ symbols: false, numeric: false, alpha: true }),
+      email: chance.email(),
+      username: chance.string({ symbols: false, numeric: true, alpha: true }),
+    };
+
+    document.querySelector("#lastname-input").value = newUserDetails.lastName;
+    document.querySelector("#firstname-input").value = newUserDetails.firstName;
+    document.querySelector("#email-input").value = newUserDetails.email;
+    document.querySelector("#username-input").value = newUserDetails.username;
+
+    const editUser = document.querySelector("#submit-btn");
+
+    fireEvent.click(editUser);
+    const newItem = JSON.parse(localStorage.getItem("users"))[0];
+    expect(oldItem).not.toStrictEqual(newItem);
+    expect(newItem.lastname).toBe(newUserDetails.lastName);
+    expect(queryByText(document.body, newUserDetails.lastName)).not.toBeNull();
+    expect(queryByText(document.body, newUserDetails.firstName)).not.toBeNull();
+    expect(queryByText(document.body, newUserDetails.username)).not.toBeNull();
+    expect(queryByText(document.body, newUserDetails.email)).not.toBeNull();
+    expect(queryByText(document.body, oldItem.lastname)).toBeNull();
+    expect(queryByText(document.body, oldItem.firstname)).toBeNull();
+    expect(queryByText(document.body, oldItem.username)).toBeNull();
+    expect(queryByText(document.body, oldItem.email)).toBeNull();
   });
 });
 
