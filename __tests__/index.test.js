@@ -484,6 +484,26 @@ describe("the user management", () => {
     const addUser = getByText(document.body, /Add User/);
     addUser.click();
   }
+  test("to test that adding user with valid inputs will added to the local storage and success message will be displayed", () => {
+    const userDetails = {
+      lastName: chance.string({ symbols: false, numeric: false, alpha: true }),
+      firstName: chance.string({ symbols: false, numeric: false, alpha: true }),
+      email: chance.email(),
+      username: chance.string({ symbols: false, numeric: true, alpha: true }),
+    };
+    createUser(userDetails);
+    expect(JSON.parse(localStorage.getItem("users"))).toStrictEqual([
+      {
+        user_id: 0,
+        username: userDetails.username,
+        email: userDetails.email,
+        firstname: userDetails.firstName,
+        lastname: userDetails.lastName,
+      },
+    ]);
+    const successMsg = getByText(document.body, /User Added Successfully/);
+    expect(successMsg.classList.contains("hide")).toBeFalsy();
+  });
 
   test("to test that created task is rendered in the table", () => {
     const userDetails = {
@@ -525,8 +545,8 @@ describe("the user management", () => {
     expect(tableRow.getAttribute("user_id")).toBe("0");
     expect(deleteBtn).toBeInTheDocument();
     fireEvent.click(deleteBtn);
-    console.log(prettyDOM(tableRow));
-    // expect(lastName).toBeNull();
+    lastName = queryByText(userTable, userDetails.lastName);
+    expect(lastName).toBeNull();
   });
 });
 

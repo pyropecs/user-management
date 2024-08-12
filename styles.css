@@ -183,6 +183,24 @@ input[type="email"] {
 .sidebar.closed ~ #main {
     margin-left: 70px;
 }
+
+.success-msg {
+  position: absolute;
+  color: #270;
+  bottom: 1%;
+  right:3%;
+  z-index: 50;
+  background-color: #DFF2BF;
+    margin: 10px 0;
+  padding: 10px;
+  border-radius: 3px 3px 3px 3px;
+}
+.success-msg img{
+  width:16px;
+  height:16px;
+}
+
+
 @media screen and (max-width: 768px) {
     .sidebar {
         width: 70px;

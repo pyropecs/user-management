@@ -12,24 +12,25 @@ const toggleBtnId = document.querySelector("#toggle-btn-id");
 const addUserBtn = document.querySelector("#create-btn-id");
 const modalWrap = document.querySelector(".wrap");
 const createGroupBtn = document.querySelector("#create-group-btn-id");
-const groupForm = document.querySelector("#group-form")
+const groupForm = document.querySelector("#group-form");
 const groupManagementBtn = document.querySelector("#group-management-btn");
 const userManagementBtn = document.querySelector("#user-management-btn");
 const roleManagementBtn = document.querySelector("#role-management-btn");
 const userManagementPage = document.querySelector("#user-management-page");
 const groupManagementPage = document.querySelector("#group-management-page");
 const roleManagementPage = document.querySelector("#role-management-page");
+const successMsg = document.querySelector("#show-success-id");
 toggleBtnId.addEventListener("click", toggleNav);
 window.addEventListener("DOMContentLoaded", renderUsers);
 userManagementBtn.addEventListener("click", () => {
   userManagementPage.classList.remove("hide");
   groupManagementPage.classList.add("hide");
-  roleManagementPage.classList.add("hide")
+  roleManagementPage.classList.add("hide");
 });
 groupManagementBtn.addEventListener("click", () => {
   userManagementPage.classList.add("hide");
   groupManagementPage.classList.remove("hide");
-  roleManagementPage.classList.add("hide")
+  roleManagementPage.classList.add("hide");
 });
 roleManagementBtn.addEventListener("click", () => {
   userManagementPage.classList.add("hide");
@@ -37,11 +38,9 @@ roleManagementBtn.addEventListener("click", () => {
   roleManagementPage.classList.remove("hide");
 });
 
-
-createGroupBtn.addEventListener("click",()=>{
-groupForm.classList.remove("hide");
-
-})
+createGroupBtn.addEventListener("click", () => {
+  groupForm.classList.remove("hide");
+});
 
 userName.addEventListener("input", () => {
   userNameError.textContent = "";
@@ -70,7 +69,7 @@ window.addEventListener("mouseup", (event) => {
 });
 window.addEventListener("mouseup", (event) => {
   const formContainer = document.querySelector("#create-group-form-container");
-  console.log(event.target)
+  console.log(event.target);
   if (!formContainer.contains(event.target)) {
     groupForm.classList.add("hide");
   }
@@ -97,6 +96,7 @@ createForm.addEventListener("submit", (e) => {
       firstname: firstNameValue,
       lastname: lastNameValue,
     });
+    showSuccess()
     renderUsers();
     userName.value = "";
     email.value = "";
@@ -278,4 +278,13 @@ function removeUserFromLocalStorage(deleteUser) {
   console.log(newUsers);
   localStorage.removeItem("users");
   localStorage.setItem("users", JSON.stringify(newUsers));
+}
+
+function showSuccess(){
+successMsg.classList.remove("hide")
+
+setTimeout(()=>{
+successMsg.classList.add("hide")
+},3000)
+
 }
