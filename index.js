@@ -248,8 +248,8 @@ function getFromLocalStorage(key) {
 }
 
 function getIndexFromLocalStorage(key) {
-  let users = JSON.parse(localStorage.getItem(key));
-  if (users === null) {
+  let users = JSON.parse(localStorage.getItem(key)) ;
+  if (users === null || users.length === 0 ) {
     return 0;
   } else {
     const lastIndex = users[users.length - 1].id;
@@ -323,7 +323,7 @@ function deleteUser(event) {
   const tableRow = target.parentElement.parentElement;
   const userId = tableRow.getAttribute("id");
 
-  removeUserFromLocalStorage(userId);
+  removeUserFromLocalStorage(userId,"users");
   renderUsers();
 }
 
@@ -348,12 +348,11 @@ function checkItemExist(items, index) {
   }
 }
 
-function removeUserFromLocalStorage(deleteUser) {
-  const users = getFromLocalStorage("users");
-  const filteredUsers = users.filter((user) => user.id !== Number(deleteUser));
-
-  localStorage.removeItem("users");
-  localStorage.setItem("users", JSON.stringify(filteredUsers));
+function removeUserFromLocalStorage(deleteItem,key) {
+  const items = getFromLocalStorage(key);
+  const filteredItems = items.filter((item) => item.id !== Number(deleteItem));
+  localStorage.removeItem(key);
+  localStorage.setItem(key, JSON.stringify(filteredItems));
 }
 function updateTodotoLocalStorage(item, key) {
   const items = JSON.parse(localStorage.getItem(key));
@@ -440,11 +439,20 @@ function createTableGroupRow(group){
 <td>${String(id)}</td>
 <td>${groupname}</td>
 
-<td> <div class="btn-group-container">  <button class="add-user"  >Add Users/Remove Users</button><button class="add-user"  >View members</button> <button class="add-user"  >delete group</button> <button class="add-user"  >edit group name</button> </div> </td> 
+<td> <div class="btn-group-container">  <button class="add-user"  >Add Users/Remove Users</button><button class="add-user"  >View members</button> <button class="delete-group-btn"  >delete group</button> <button class="add-user"  >edit group name</button> </div> </td> 
 `;
-  // const deleteBtn = tableRow.querySelector(".delete-btn");
+  const deleteBtn = tableRow.querySelector(".delete-group-btn");
   // const editBtn = tableRow.querySelector(".edit-btn");
-  // deleteBtn.addEventListener("click", deleteUser);
+  deleteBtn.addEventListener("click", deleteGroup);
   // editBtn.addEventListener("click", editUser);
   return tableRow;
+}
+function deleteGroup(event) {
+  const target = event.target;
+
+  const tableRow = target.parentElement.parentElement.parentElement;
+  const groupId = tableRow.getAttribute("id");
+  console.log(groupId)
+  removeUserFromLocalStorage(groupId,"groups");
+  renderGroups();
 }

@@ -645,7 +645,7 @@ describe("user edit functionality", () => {
     let editUser = document.querySelector("#submit-btn");
     fireEvent.click(editUser);
     editUser = document.querySelector("#submit-btn");
-    expect(editUser.textContent).toBe("Add User")
+    expect(editUser.textContent).toBe("Add User");
     const userTitle = document.querySelector("#user-title-id");
     expect(userTitle.textContent).toBe("Create User");
     const newItem = JSON.parse(localStorage.getItem("users"))[0];
@@ -715,26 +715,54 @@ describe("group managment ", () => {
     expect(createGroupBtn.disabled).toBeFalsy();
     expect(createGroupBtn).toBeInTheDocument();
   });
-  test("the group should be created when valid input is entered",()=>{
-
-    
-    const validGroupName = chance.string({symbols:false,numeric:true,alpha:true})
-    const inputform = document.querySelector("#groupname-input")
-    inputform.value = validGroupName
+  test("the group should be created when valid input is entered", () => {
+    const validGroupName = chance.string({
+      symbols: false,
+      numeric: true,
+      alpha: true,
+    });
+    const inputform = document.querySelector("#groupname-input");
+    inputform.value = validGroupName;
     const createGroupBtn = document.querySelector("#submit-group-btn");
     const groupNameError = document.querySelector("#groupname-error");
-    
-    fireEvent.click(createGroupBtn)
-    expect(queryByText(document.body,/Group Created Successfully/)).not.toBeNull();
+    expect(groupNameError.textContent).toBe("");
+    fireEvent.click(createGroupBtn);
+    expect(
+      queryByText(document.body, /Group Created Successfully/)
+    ).not.toBeNull();
     const item = JSON.parse(localStorage.getItem("groups"));
-   
-  
+    expect(groupNameError.textContent).toBe("");
     expect(item[0].groupname).toBe(validGroupName);
-  
-    expect(queryByText(document.body,validGroupName)).not.toBeNull();
-  })
-
-
+    const groupName = getByText(document.body, validGroupName);
+    expect(groupName).toBeInTheDocument();
+  });
+  test("the error should be displayed when invalid group name is entered", () => {
+    const invalidGroupName = "";
+    const inputform = document.querySelector("#groupname-input");
+    inputform.value = invalidGroupName;
+    const createGroupBtn = document.querySelector("#submit-group-btn");
+    const groupNameError = document.querySelector("#groupname-error");
+    expect(groupNameError.textContent).toBe("");
+    fireEvent.click(createGroupBtn);
+    expect(groupNameError.textContent).toBe("Group name is required");
+  });
+  test("to check that clicking delete button from one group should delete the entire group", () => {
+    const validGroupName = chance.string({
+      symbols: false,
+      numeric: true,
+      alpha: true,
+    });
+    const inputform = document.querySelector("#groupname-input");
+    inputform.value = validGroupName;
+    const createGroupBtn = document.querySelector("#submit-group-btn");
+    fireEvent.click(createGroupBtn);
+    const groupName = getByText(document.body, validGroupName);
+    const tableRow = groupName.parentElement.parentElement;
+    const deleteBtn = getByText(tableRow, /delete/);
+    expect(queryByText(document.body, validGroupName)).not.toBeNull();
+    fireEvent(deleteBtn, new Event("click"));
+    expect(queryByText(document.body, validGroupName)).toBeNull();
+  });
 });
 
 describe("role management", () => {
