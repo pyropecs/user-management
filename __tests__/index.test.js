@@ -349,7 +349,7 @@ describe("creation of user", () => {
     addUser.click();
     expect(JSON.parse(localStorage.getItem("users"))).toStrictEqual([
       {
-        user_id: 0,
+        id: 0,
         username: userNameValue,
         email: emailValue,
         firstname: firstNameValue,
@@ -495,7 +495,7 @@ describe("the user management", () => {
     createUser(userDetails);
     expect(JSON.parse(localStorage.getItem("users"))).toStrictEqual([
       {
-        user_id: 0,
+        id: 0,
         username: userDetails.username,
         email: userDetails.email,
         firstname: userDetails.firstName,
@@ -529,7 +529,7 @@ describe("the user management", () => {
     const deleteBtn = getByText(userTable, /Delete/);
     expect(deleteBtn).toBeInTheDocument();
     const tableRow = lastName.parentElement;
-    expect(tableRow).toHaveAttribute("user_id", "0");
+    expect(tableRow).toHaveAttribute("id", "0");
   });
   test("to check that clicking delete button actually delete the selected user", () => {
     const userDetails = {
@@ -543,7 +543,7 @@ describe("the user management", () => {
     let lastName = getByText(userTable, userDetails.lastName);
     const tableRow = lastName.parentElement;
     const deleteBtn = getByText(tableRow, /Delete/);
-    expect(tableRow.getAttribute("user_id")).toBe("0");
+    expect(tableRow.getAttribute("id")).toBe("0");
     expect(deleteBtn).toBeInTheDocument();
     fireEvent.click(deleteBtn);
     lastName = queryByText(userTable, userDetails.lastName);
@@ -715,6 +715,26 @@ describe("group managment ", () => {
     expect(createGroupBtn.disabled).toBeFalsy();
     expect(createGroupBtn).toBeInTheDocument();
   });
+  test("the group should be created when valid input is entered",()=>{
+
+    
+    const validGroupName = chance.string({symbols:false,numeric:true,alpha:true})
+    const inputform = document.querySelector("#groupname-input")
+    inputform.value = validGroupName
+    const createGroupBtn = document.querySelector("#submit-group-btn");
+    const groupNameError = document.querySelector("#groupname-error");
+    
+    fireEvent.click(createGroupBtn)
+    expect(queryByText(document.body,/Group Created Successfully/)).not.toBeNull();
+    const item = JSON.parse(localStorage.getItem("groups"));
+   
+  
+    expect(item[0].groupname).toBe(validGroupName);
+  
+    expect(queryByText(document.body,validGroupName)).not.toBeNull();
+  })
+
+
 });
 
 describe("role management", () => {

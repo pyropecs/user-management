@@ -21,8 +21,13 @@ const groupManagementPage = document.querySelector("#group-management-page");
 const roleManagementPage = document.querySelector("#role-management-page");
 const successMsg = document.querySelector("#show-success-id");
 const userTitle = document.querySelector("#user-title-id");
+// group management page variables
+const groupNameInput = document.querySelector("#groupname-input");
+const groupNameError = document.querySelector("#groupname-error");
+const groupSubmitForm = document.querySelector("#group-submit-form")
 toggleBtnId.addEventListener("click", toggleNav);
 window.addEventListener("DOMContentLoaded", renderUsers);
+window.addEventListener("DOMContentLoaded",renderGroups)
 userManagementBtn.addEventListener("click", () => {
   userManagementPage.classList.remove("hide");
   groupManagementPage.classList.add("hide");
@@ -101,7 +106,7 @@ function submitEditForm(isValid, inputValues) {
   const editIndex = modalWrap.getAttribute("editIndex");
   if (isValid) {
     const updatedUser = {
-      user_id: Number(editIndex),
+      id: Number(editIndex),
       username: inputValues.userNameValue,
       email: inputValues.emailValue,
       firstname: inputValues.firstNameValue,
@@ -125,7 +130,7 @@ function submitEditForm(isValid, inputValues) {
 function createSubmitForm(isValid, inputValues) {
   if (isValid) {
     saveToLocalStorage("users", {
-      user_id: getIndexFromLocalStorage("users"),
+      id: getIndexFromLocalStorage("users"),
       username: inputValues.userNameValue,
       email: inputValues.emailValue,
       firstname: inputValues.firstNameValue,
@@ -224,13 +229,13 @@ function addError(container) {
 }
 
 function saveToLocalStorage(key, object) {
-  let users = JSON.parse(localStorage.getItem(key));
-  if (users === null) {
-    users = [object];
+  let items = JSON.parse(localStorage.getItem(key));
+  if (items === null) {
+    items = [object];
   } else {
-    users.push(object);
+    items.push(object);
   }
-  const usersJSON = JSON.stringify(users);
+  const usersJSON = JSON.stringify(items);
   localStorage.setItem(key, usersJSON);
 }
 function getFromLocalStorage(key) {
@@ -247,13 +252,13 @@ function getIndexFromLocalStorage(key) {
   if (users === null) {
     return 0;
   } else {
-    const lastIndex = users[users.length - 1].user_id
+    const lastIndex = users[users.length - 1].id;
     return lastIndex + 1;
   }
 }
 function toggleNav() {
   const sidebar = document.getElementById("mySidebar");
-  const main = document.getElementById("main");
+
   sidebar.classList.toggle("closed");
   if (window.innerWidth <= 768) {
     sidebar.classList.toggle("open");
@@ -273,12 +278,12 @@ function renderUsers() {
 }
 
 function createTableRow(user) {
-  const { user_id, username, firstname, lastname, email } = user;
+  const { id, username, firstname, lastname, email } = user;
   const tableRow = document.createElement("tr");
   tableRow.classList.add("user-table-row");
-  tableRow.setAttribute("user_id", `${user_id}`);
+  tableRow.setAttribute("id", `${id}`);
   tableRow.innerHTML = `
-<td>${String(user_id)}</td>
+<td>${String(id)}</td>
 <td>${username}</td>
 <td>${firstname}</td>
 <td>${lastname}</td>
@@ -295,7 +300,7 @@ function createTableRow(user) {
 function editUser(event) {
   const target = event.target;
   const userRow = target.parentElement.parentElement;
-  const userId = userRow.getAttribute("user_id");
+  const userId = userRow.getAttribute("id");
   modalWrap.classList.remove("hide");
   modalWrap.setAttribute("editIndex", userId);
   modalWrap.setAttribute("isEdit", "true");
@@ -316,7 +321,7 @@ function deleteUser(event) {
   const target = event.target;
 
   const tableRow = target.parentElement.parentElement;
-  const userId = tableRow.getAttribute("user_id");
+  const userId = tableRow.getAttribute("id");
 
   removeUserFromLocalStorage(userId);
   renderUsers();
@@ -327,14 +332,14 @@ function getItemFromLocalStorageUsingIndex(index, key) {
 
   const isTaskExist = checkItemExist(items, Number(index));
   if (isTaskExist) {
-    const [item] = items.filter((item) => item.user_id === Number(index));
+    const [item] = items.filter((item) => item.id === Number(index));
     return item;
   } else {
     throw new Error("the given task didnt exist");
   }
 }
 function checkItemExist(items, index) {
-  const number = items.findIndex((item) => index === item.user_id);
+  const number = items.findIndex((item) => index === item.id);
 
   if (number >= 0) {
     return true;
@@ -345,10 +350,7 @@ function checkItemExist(items, index) {
 
 function removeUserFromLocalStorage(deleteUser) {
   const users = getFromLocalStorage("users");
-  const filteredUsers = users.filter(
-    (user) => user.user_id !== Number(deleteUser)
-  );
-
+  const filteredUsers = users.filter((user) => user.id !== Number(deleteUser));
 
   localStorage.removeItem("users");
   localStorage.setItem("users", JSON.stringify(filteredUsers));
@@ -364,10 +366,10 @@ function updateTodotoLocalStorage(item, key) {
   }
 }
 function updateItem(items, item) {
-  const isTaskExist = checkItemExist(items, Number(item.user_id));
+  const isTaskExist = checkItemExist(items, Number(item.id));
   if (isTaskExist) {
     const newItems = items.map((renderItem) => {
-      if (renderItem.user_id === Number(item.user_id)) {
+      if (renderItem.id === Number(item.id)) {
         renderItem.username = item.username;
         renderItem.lastname = item.lastname;
         renderItem.firstname = item.firstname;
@@ -383,9 +385,66 @@ function updateItem(items, item) {
 
 function showSuccess(message) {
   successMsg.classList.remove("hide");
-const successMessage = document.querySelector("#show-success-id span")
-successMessage.textContent = message
+  const successMessage = document.querySelector("#show-success-id span");
+  successMessage.textContent = message;
   setTimeout(() => {
     successMsg.classList.add("hide");
   }, 3000);
+}
+
+groupSubmitForm.addEventListener("submit",( e) => {
+  e.preventDefault()
+  const value = groupNameInput.value;
+  const isValid = validateGroupName(value);
+  if (isValid) {
+    
+    const group = {
+      id: getIndexFromLocalStorage("groups"),
+      groupname: value,
+      users:[]
+    };
+    saveToLocalStorage("groups", group);
+    showSuccess("Group Created Successfully");
+    renderGroups()
+    groupForm.classList.add("hide")
+  }
+});
+
+function validateGroupName(groupName) {
+  if (groupName === "") {
+    groupNameError.textContent = "Group name is required";
+    addError(groupNameError);
+    return false;
+  }
+  return true;
+}
+
+function renderGroups() {
+  const groups = getFromLocalStorage("groups");
+
+  const groupTableBody = document.querySelector("#group-table-body");
+  groupTableBody.innerHTML = "";
+  groups.forEach((group) => {
+    const tableRow = createTableGroupRow(group);
+
+    groupTableBody.append(tableRow);
+  });
+}
+
+function createTableGroupRow(group){
+  const { id, groupname } = group;
+  const tableRow = document.createElement("tr");
+  tableRow.classList.add("user-table-row");
+  tableRow.setAttribute("id", `${id}`);
+  tableRow.innerHTML = `
+<td>${String(id)}</td>
+<td>${groupname}</td>
+
+<td> <div class="btn-group-container">  <button class="add-user"  >Add Users/Remove Users</button><button class="add-user"  >View members</button> <button class="add-user"  >delete group</button> <button class="add-user"  >edit group name</button> </div> </td> 
+`;
+  // const deleteBtn = tableRow.querySelector(".delete-btn");
+  // const editBtn = tableRow.querySelector(".edit-btn");
+  // deleteBtn.addEventListener("click", deleteUser);
+  // editBtn.addEventListener("click", editUser);
+  return tableRow;
 }

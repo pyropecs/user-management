@@ -201,6 +201,11 @@ input[type="email"] {
 }
 
 
+.btn-group-container button{
+  margin:1%;
+
+}
+
 @media screen and (max-width: 768px) {
     .sidebar {
         width: 70px;
