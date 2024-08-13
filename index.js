@@ -24,10 +24,14 @@ const userTitle = document.querySelector("#user-title-id");
 // group management page variables
 const groupNameInput = document.querySelector("#groupname-input");
 const groupNameError = document.querySelector("#groupname-error");
-const groupSubmitForm = document.querySelector("#group-submit-form")
+const groupSubmitForm = document.querySelector("#group-submit-form");
+const userListModal = document.querySelector("#group-users-form");
+
+const multiUserSelect = document.querySelector("#multi-user-select");
+multiUserSelect.addEventListener("click",showCheckboxes)
 toggleBtnId.addEventListener("click", toggleNav);
 window.addEventListener("DOMContentLoaded", renderUsers);
-window.addEventListener("DOMContentLoaded",renderGroups)
+window.addEventListener("DOMContentLoaded", renderGroups);
 userManagementBtn.addEventListener("click", () => {
   userManagementPage.classList.remove("hide");
   groupManagementPage.classList.add("hide");
@@ -36,7 +40,9 @@ userManagementBtn.addEventListener("click", () => {
 groupManagementBtn.addEventListener("click", () => {
   userManagementPage.classList.add("hide");
   groupManagementPage.classList.remove("hide");
+  renderCheckboxes()
   roleManagementPage.classList.add("hide");
+
 });
 roleManagementBtn.addEventListener("click", () => {
   userManagementPage.classList.add("hide");
@@ -78,6 +84,13 @@ window.addEventListener("mouseup", (event) => {
 
   if (!formContainer.contains(event.target)) {
     groupForm.classList.add("hide");
+  }
+});
+window.addEventListener("mouseup", (event) => {
+  const multiuserSelect = document.querySelector("#multi-user-select");
+
+  if (!multiuserSelect.contains(event.target)) {
+    userListModal.classList.add("hide");
   }
 });
 createForm.addEventListener("submit", (e) => {
@@ -248,8 +261,8 @@ function getFromLocalStorage(key) {
 }
 
 function getIndexFromLocalStorage(key) {
-  let users = JSON.parse(localStorage.getItem(key)) ;
-  if (users === null || users.length === 0 ) {
+  let users = JSON.parse(localStorage.getItem(key));
+  if (users === null || users.length === 0) {
     return 0;
   } else {
     const lastIndex = users[users.length - 1].id;
@@ -323,7 +336,7 @@ function deleteUser(event) {
   const tableRow = target.parentElement.parentElement;
   const userId = tableRow.getAttribute("id");
 
-  removeUserFromLocalStorage(userId,"users");
+  removeUserFromLocalStorage(userId, "users");
   renderUsers();
 }
 
@@ -348,7 +361,7 @@ function checkItemExist(items, index) {
   }
 }
 
-function removeUserFromLocalStorage(deleteItem,key) {
+function removeUserFromLocalStorage(deleteItem, key) {
   const items = getFromLocalStorage(key);
   const filteredItems = items.filter((item) => item.id !== Number(deleteItem));
   localStorage.removeItem(key);
@@ -391,21 +404,20 @@ function showSuccess(message) {
   }, 3000);
 }
 
-groupSubmitForm.addEventListener("submit",( e) => {
-  e.preventDefault()
+groupSubmitForm.addEventListener("submit", (e) => {
+  e.preventDefault();
   const value = groupNameInput.value;
   const isValid = validateGroupName(value);
   if (isValid) {
-    
     const group = {
       id: getIndexFromLocalStorage("groups"),
       groupname: value,
-      users:[]
+      users: [],
     };
     saveToLocalStorage("groups", group);
     showSuccess("Group Created Successfully");
-    renderGroups()
-    groupForm.classList.add("hide")
+    renderGroups();
+    groupForm.classList.add("hide");
   }
 });
 
@@ -430,7 +442,7 @@ function renderGroups() {
   });
 }
 
-function createTableGroupRow(group){
+function createTableGroupRow(group) {
   const { id, groupname } = group;
   const tableRow = document.createElement("tr");
   tableRow.classList.add("user-table-row");
@@ -439,12 +451,15 @@ function createTableGroupRow(group){
 <td>${String(id)}</td>
 <td>${groupname}</td>
 
-<td> <div class="btn-group-container">  <button class="add-user"  >Add Users/Remove Users</button><button class="add-user"  >View members</button> <button class="delete-group-btn"  >delete group</button> <button class="add-user"  >edit group name</button> </div> </td> 
+<td> <div class="btn-group-container">  <button class="add-user" id="add-group-users" >Add Users/Remove Users</button><button class="add-user"  >View members</button> <button class="delete-group-btn"  >delete group</button>  </div> </td> 
 `;
   const deleteBtn = tableRow.querySelector(".delete-group-btn");
-  // const editBtn = tableRow.querySelector(".edit-btn");
+  const addUsersAndRemoveUsersBtn = tableRow.querySelector("#add-group-users");
   deleteBtn.addEventListener("click", deleteGroup);
-  // editBtn.addEventListener("click", editUser);
+  addUsersAndRemoveUsersBtn.addEventListener(
+    "click",
+    addAndRemoveUsersFromGroup
+  );
   return tableRow;
 }
 function deleteGroup(event) {
@@ -452,7 +467,47 @@ function deleteGroup(event) {
 
   const tableRow = target.parentElement.parentElement.parentElement;
   const groupId = tableRow.getAttribute("id");
-  console.log(groupId)
-  removeUserFromLocalStorage(groupId,"groups");
+  console.log(groupId);
+  removeUserFromLocalStorage(groupId, "groups");
   renderGroups();
+}
+function addAndRemoveUsersFromGroup(event) {
+  userListModal.classList.remove("hide");
+}
+
+let expanded = false;
+
+
+// });
+
+// <label for="one">
+//                 <input type="checkbox" id="one" />First checkbox</label>
+function renderCheckboxes(){
+  const checkboxes = document.querySelector("#checkboxes");
+  checkboxes.innerHTML = ""
+  const users = getFromLocalStorage("users");
+users.forEach((user,index)=>{
+const label = document.createElement("label")
+label.setAttribute("for",index)
+label.innerHTML = `<input type="checkbox" id=${index} />${user.username}</label>`
+checkboxes.append(label)
+})
+
+}
+
+window.addEventListener("load",()=>{
+renderCheckboxes()
+})
+function showCheckboxes() {
+  renderCheckboxes()
+  const checkboxes = document.querySelector("#checkboxes");
+  checkboxes.style.display = "block";
+  // if (!expanded) {
+    
+  //   expanded = true;
+
+  // } else {
+  //   checkboxes.style.display = "none";
+  //   expanded = false;
+  // }
 }

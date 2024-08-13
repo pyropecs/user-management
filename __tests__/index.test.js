@@ -765,6 +765,84 @@ describe("group managment ", () => {
   });
 });
 
+describe("add users functionality", () => {
+  const validGroupName = chance.string();
+
+  function createUser(userDetails) {
+    const lastName = document.querySelector("#lastname-input");
+    const userForm = document.querySelector("#user-form");
+    const lastNameValue = userDetails.lastName;
+    lastName.value = lastNameValue;
+    const firstName = document.querySelector("#firstname-input");
+    const firstNameValue = userDetails.firstName;
+    firstName.value = firstNameValue;
+    const email = document.querySelector("#email-input");
+    const emailValue = userDetails.email;
+    email.value = emailValue;
+    const userName = document.querySelector("#username-input");
+    const userNameValue = userDetails.username;
+    userName.value = userNameValue;
+    const addUser = getByText(userForm, /Add User/);
+    addUser.click();
+  }
+  beforeEach(() => {
+    const inputform = document.querySelector("#groupname-input");
+    inputform.value = validGroupName;
+    const createGroupBtn = document.querySelector("#submit-group-btn");
+    fireEvent.click(createGroupBtn);
+  });
+  test("by clicking add/remove users it should open a new modal and it should close by clicking outside of the modal", () => {
+    const userListModal = document.querySelector("#group-users-form");
+    expect(userListModal).toBeInTheDocument();
+    const groupName = getByText(document.body, validGroupName);
+    const tableRow = groupName.parentElement.parentElement;
+    const addUser = getByText(tableRow, /Add Users\/Remove Users/);
+    expect(addUser).toBeInTheDocument();
+    expect(userListModal.classList.contains("hide")).toBeTruthy();
+    fireEvent.click(addUser);
+    expect(userListModal.classList.contains("hide")).toBeFalsy();
+  });
+
+  test("to check that form elements are present in the modal", () => {
+    const multiUserSelect = document.querySelector("#multi-user-select");
+    expect(multiUserSelect).toBeInTheDocument();
+  });
+
+  test("to check that list of registered users shown in the drop down", () => {
+    const users = [];
+    const numberOfUsers = 5;
+    for (let i = 0; i < numberOfUsers; i++) {
+      const userDetails = {
+        lastName: chance.string({
+          symbols: false,
+          numeric: false,
+          alpha: true,
+        }),
+        firstName: chance.string({
+          symbols: false,
+          numeric: false,
+          alpha: true,
+        }),
+        email: chance.email(),
+        username: chance.string({ symbols: false, numeric: true, alpha: true }),
+      };
+
+      createUser(userDetails);
+      users.push(userDetails.username);
+    }
+    const groupName = getByText(document.body, validGroupName);
+    const tableRow = groupName.parentElement.parentElement;
+    const addUser = getByText(tableRow, /Add Users\/Remove Users/);
+    expect(addUser).toBeInTheDocument();
+    fireEvent.click(addUser);
+    const multiUserSelect = document.querySelector("#multi-user-select");
+    fireEvent.click(multiUserSelect);
+    const checkboxes = document.querySelector("#checkboxes");
+    const user = getByText(checkboxes, users[0]);
+    expect(user).toBeInTheDocument();
+  });
+});
+
 describe("role management", () => {
   test("to check that from user management button clicking role management button will go to the role management page", () => {
     const roleManagementBtn = document.querySelector("#role-management-btn");
