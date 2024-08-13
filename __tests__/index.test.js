@@ -835,11 +835,110 @@ describe("add users functionality", () => {
     const addUser = getByText(tableRow, /Add Users\/Remove Users/);
     expect(addUser).toBeInTheDocument();
     fireEvent.click(addUser);
-    const multiUserSelect = document.querySelector("#multi-user-select");
-    fireEvent.click(multiUserSelect);
     const checkboxes = document.querySelector("#checkboxes");
     const user = getByText(checkboxes, users[0]);
     expect(user).toBeInTheDocument();
+  });
+
+  test("to check that list of users should be added in the particular group  ", () => {
+    const users = [];
+    const numberOfUsers = 3;
+    for (let i = 0; i < numberOfUsers; i++) {
+      const userDetails = {
+        lastName: chance.string({
+          symbols: false,
+          numeric: false,
+          alpha: true,
+        }),
+        firstName: chance.string({
+          symbols: false,
+          numeric: false,
+          alpha: true,
+        }),
+        email: chance.email(),
+        username: chance.string({ symbols: false, numeric: true, alpha: true }),
+      };
+
+      createUser(userDetails);
+      users.push(userDetails.username);
+    }
+
+    const groupName = getByText(document.body, validGroupName);
+    const tableRow = groupName.parentElement.parentElement;
+    const addUser = getByText(tableRow, /Add Users\/Remove Users/);
+    fireEvent.click(addUser);
+    const checkboxes = document.querySelector("#checkboxes");
+    const user = getByText(checkboxes, users[1]);
+    const userAddBtn = document.querySelector("#user-add-btn");
+    expect(userAddBtn).toBeInTheDocument();
+    fireEvent.click(user);
+    fireEvent.click(userAddBtn);
+
+    expect(JSON.parse(localStorage.getItem("groups"))).toStrictEqual([
+      {
+        id: 0,
+        groupname: validGroupName,
+        users: ["1"],
+      },
+    ]);
+    expect(
+      queryByText(document.body, /Members in group is Updated Successfully/)
+    ).not.toBeNull();
+    const userListModal = document.querySelector("#group-users-form");
+    expect(userListModal.classList.contains("hide")).toBeTruthy();
+  });
+
+  describe("to test existing members in that group", () => {
+    const users = [];
+    const numberOfUsers = 3;
+    beforeEach(() => {
+      for (let i = 0; i < numberOfUsers; i++) {
+        const userDetails = {
+          lastName: chance.string({
+            symbols: false,
+            numeric: false,
+            alpha: true,
+          }),
+          firstName: chance.string({
+            symbols: false,
+            numeric: false,
+            alpha: true,
+          }),
+          email: chance.email(),
+          username: chance.string({
+            symbols: false,
+            numeric: true,
+            alpha: true,
+          }),
+        };
+
+        createUser(userDetails);
+        users.push(userDetails.username);
+      }
+
+      const groupName = getByText(document.body, validGroupName);
+      const tableRow = groupName.parentElement.parentElement;
+      const addUser = getByText(tableRow, /Add Users\/Remove Users/);
+      fireEvent.click(addUser);
+      const checkboxes = document.querySelector("#checkboxes");
+      const user = getByText(checkboxes, users[1]);
+      const userAddBtn = document.querySelector("#user-add-btn");
+      let updatedUser = getByText(checkboxes, users[1]);
+      let userCheckbox = updatedUser.querySelector("input");
+      expect(userCheckbox.checked).toBe(false);
+      fireEvent.click(user);
+      fireEvent.click(userAddBtn);
+      expect(userCheckbox.checked).toBe(true);
+    });
+    test("the list of users should checked in the checkbox who are already is member in that", () => {
+      updatedUser = getByText(checkboxes, users[1]);
+      userCheckbox = updatedUser.querySelector("input");
+      const user = getByText(checkboxes, users[0]);
+      const notMemberCheckbox = user.querySelector("input");
+
+      expect(userCheckbox.checked).toBe(true);
+      expect(notMemberCheckbox.checked).toBe(false);
+    });
   });
 });
 

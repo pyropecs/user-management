@@ -331,46 +331,14 @@ border:1px solid #000;
     padding:1%;
 }
 
-.dropdown {
-  position: relative;
-  display: inline-block;
+#checkboxes{
+  display: flex;
+  flex-direction: column;
+ 
+width: 70%;
+justify-content: center;
 }
 
-.dropdown-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  background-color: #f9f9f9;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.dropdown-menu label {
-  display: block;
-  padding: 8px 16px;
-}
-
-.dropdown-checkbox {
-  margin-right: 10px;
-}
-
-.dropdown-menu label:hover {
-  background-color: #f1f1f1;
-}
-
-/* Show the dropdown menu */
-.show {
-  display: block;
+.checkbox-form{
+  width: 100%;
 }

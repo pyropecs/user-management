@@ -28,7 +28,8 @@ const groupSubmitForm = document.querySelector("#group-submit-form");
 const userListModal = document.querySelector("#group-users-form");
 
 const multiUserSelect = document.querySelector("#multi-user-select");
-multiUserSelect.addEventListener("click",showCheckboxes)
+
+multiUserSelect.addEventListener("click", showCheckboxes);
 toggleBtnId.addEventListener("click", toggleNav);
 window.addEventListener("DOMContentLoaded", renderUsers);
 window.addEventListener("DOMContentLoaded", renderGroups);
@@ -40,9 +41,8 @@ userManagementBtn.addEventListener("click", () => {
 groupManagementBtn.addEventListener("click", () => {
   userManagementPage.classList.add("hide");
   groupManagementPage.classList.remove("hide");
-  renderCheckboxes()
-  roleManagementPage.classList.add("hide");
 
+  roleManagementPage.classList.add("hide");
 });
 roleManagementBtn.addEventListener("click", () => {
   userManagementPage.classList.add("hide");
@@ -348,7 +348,7 @@ function getItemFromLocalStorageUsingIndex(index, key) {
     const [item] = items.filter((item) => item.id === Number(index));
     return item;
   } else {
-    throw new Error("the given task didnt exist");
+    throw new Error("the given item didnt exist");
   }
 }
 function checkItemExist(items, index) {
@@ -382,10 +382,11 @@ function updateItem(items, item) {
   if (isTaskExist) {
     const newItems = items.map((renderItem) => {
       if (renderItem.id === Number(item.id)) {
-        renderItem.username = item.username;
-        renderItem.lastname = item.lastname;
-        renderItem.firstname = item.firstname;
-        renderItem.email = item.email;
+        for (const key in item) {
+          if (item.hasOwnProperty(key)) {
+            renderItem[key] = item[key];
+          }
+        }
       }
       return renderItem;
     });
@@ -473,41 +474,60 @@ function deleteGroup(event) {
 }
 function addAndRemoveUsersFromGroup(event) {
   userListModal.classList.remove("hide");
+  const target = event.target;
+  const tableRow = target.parentElement.parentElement.parentElement;
+  const groupId = tableRow.getAttribute("id");
+  userListModal.setAttribute("group-id", groupId);
+  renderCheckboxes();
 }
 
-let expanded = false;
+multiUserSelect.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const checkboxes = Array.from(document.querySelectorAll(".checkbox"));
+  const checkedCheckboxes = checkboxes.filter((checkbox) => {
+    return checkbox.checked === true;
+  });
+  const userIndex = checkedCheckboxes.map((checkedCheckbox) => {
+    const id = checkedCheckbox.getAttribute("id");
+    return id;
+  });
 
+  const groupId = userListModal.getAttribute("group-id");
+  const group = getItemFromLocalStorageUsingIndex(groupId, "groups");
+  const updatedGroup = {
+    ...group,
+    users: userIndex,
+  };
+  updateTodotoLocalStorage(updatedGroup, "groups");
+  showSuccess("Members in group is Updated Successfully");
+  userListModal.classList.add("hide");
+});
 
-// });
-
-// <label for="one">
-//                 <input type="checkbox" id="one" />First checkbox</label>
-function renderCheckboxes(){
+function renderCheckboxes() {
   const checkboxes = document.querySelector("#checkboxes");
-  checkboxes.innerHTML = ""
+  checkboxes.innerHTML = "";
   const users = getFromLocalStorage("users");
-users.forEach((user,index)=>{
-const label = document.createElement("label")
-label.setAttribute("for",index)
-label.innerHTML = `<input type="checkbox" id=${index} />${user.username}</label>`
-checkboxes.append(label)
-})
+  users.forEach((user, index) => {
+    const label = document.createElement("label");
+    label.classList.add("checkbox");
+    const groupId = userListModal.getAttribute("group-id");
+    const isAlreadyMember = checkUserisAlreadyAMember(groupId, String(user.id));
 
+    label.innerHTML = `<input type="checkbox" ${
+      isAlreadyMember ? "checked" : ""
+    }  class="checkbox" id=${user.id} />${user.username}</label>`;
+    checkboxes.append(label);
+  });
 }
 
-window.addEventListener("load",()=>{
-renderCheckboxes()
-})
-function showCheckboxes() {
-  renderCheckboxes()
-  const checkboxes = document.querySelector("#checkboxes");
-  checkboxes.style.display = "block";
-  // if (!expanded) {
-    
-  //   expanded = true;
+function showCheckboxes(e) {
+  e.stopPropagation();
 
-  // } else {
-  //   checkboxes.style.display = "none";
-  //   expanded = false;
-  // }
+  const checkboxes = document.querySelector("#checkboxes");
+  checkboxes.style.display = "flex";
+}
+function checkUserisAlreadyAMember(groupId, userId) {
+  const group = getItemFromLocalStorageUsingIndex(groupId, "groups");
+  const members = group.users;
+  return members.includes(userId);
 }
