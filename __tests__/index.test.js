@@ -940,6 +940,68 @@ describe("add users functionality", () => {
       expect(notMemberCheckbox.checked).toBe(false);
     });
   });
+  test("view members is button is clickable and open the modal", () => {
+    const groupName = getByText(document.body, validGroupName);
+    const tableRow = groupName.parentElement.parentElement;
+    const addUser = getByText(tableRow, /View members/);
+    expect(addUser).toBeInTheDocument();
+    fireEvent.click(addUser);
+    const groupMembers = document.querySelector("#group-users-list");
+    expect(groupMembers.classList.contains("hide")).toBeFalsy();
+  });
+  describe("to check view members that are already added", () => {
+    const users = [];
+    const numberOfUsers = 3;
+    beforeEach(() => {
+      for (let i = 0; i < numberOfUsers; i++) {
+        const userDetails = {
+          lastName: chance.string({
+            symbols: false,
+            numeric: false,
+            alpha: true,
+          }),
+          firstName: chance.string({
+            symbols: false,
+            numeric: false,
+            alpha: true,
+          }),
+          email: chance.email(),
+          username: chance.string({
+            symbols: false,
+            numeric: true,
+            alpha: true,
+          }),
+        };
+
+        createUser(userDetails);
+        users.push(userDetails.username);
+      }
+
+      const groupName = getByText(document.body, validGroupName);
+      const tableRow = groupName.parentElement.parentElement;
+      const addUser = getByText(tableRow, /Add Users\/Remove Users/);
+      fireEvent.click(addUser);
+      const checkboxes = document.querySelector("#checkboxes");
+      const user = getByText(checkboxes, users[1]);
+      const userAddBtn = document.querySelector("#user-add-btn");
+      let updatedUser = getByText(checkboxes, users[1]);
+      let userCheckbox = updatedUser.querySelector("input");
+      expect(userCheckbox.checked).toBe(false);
+      fireEvent.click(user);
+      fireEvent.click(userAddBtn);
+      expect(userCheckbox.checked).toBe(true);
+    });
+
+    test("view members should be displayed which are already added in the respective group", () => {
+      const groupName = getByText(document.body, validGroupName);
+      const tableRow = groupName.parentElement.parentElement;
+      const viewMembers = getByText(tableRow, /View members/);
+      fireEvent.click(viewMembers);
+      const groupMembers = document.querySelector("#group-users-list");
+      const member = getByText(groupMembers, users[1]);
+      expect(member).toBeInTheDocument();
+    });
+  });
 });
 
 describe("role management", () => {

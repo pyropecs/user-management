@@ -28,7 +28,7 @@ const groupSubmitForm = document.querySelector("#group-submit-form");
 const userListModal = document.querySelector("#group-users-form");
 
 const multiUserSelect = document.querySelector("#multi-user-select");
-
+const groupMembers = document.querySelector("#group-users-list");
 multiUserSelect.addEventListener("click", showCheckboxes);
 toggleBtnId.addEventListener("click", toggleNav);
 window.addEventListener("DOMContentLoaded", renderUsers);
@@ -93,6 +93,14 @@ window.addEventListener("mouseup", (event) => {
     userListModal.classList.add("hide");
   }
 });
+window.addEventListener("mouseup", (event) => {
+  const multiuserSelect = document.querySelector("#group-users-list-modal");
+
+  if (!multiuserSelect.contains(event.target)) {
+    groupMembers.classList.add("hide");
+  }
+});
+
 createForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const userNameValue = userName.value;
@@ -452,10 +460,14 @@ function createTableGroupRow(group) {
 <td>${String(id)}</td>
 <td>${groupname}</td>
 
-<td> <div class="btn-group-container">  <button class="add-user" id="add-group-users" >Add Users/Remove Users</button><button class="add-user"  >View members</button> <button class="delete-group-btn"  >delete group</button>  </div> </td> 
+<td> <div class="btn-group-container">  <button class="add-user" id="add-group-users" >Add Users/Remove Users</button><button class="view-user"  >View members</button> <button class="delete-group-btn"  >delete group</button>  </div> </td> 
 `;
   const deleteBtn = tableRow.querySelector(".delete-group-btn");
   const addUsersAndRemoveUsersBtn = tableRow.querySelector("#add-group-users");
+  const viewMemBtn = tableRow.querySelector(".view-user");
+  viewMemBtn.addEventListener("click", () => {
+    viewMembers(id);
+  });
   deleteBtn.addEventListener("click", deleteGroup);
   addUsersAndRemoveUsersBtn.addEventListener(
     "click",
@@ -463,6 +475,35 @@ function createTableGroupRow(group) {
   );
   return tableRow;
 }
+
+function viewMembers(groupId) {
+  groupMembers.classList.remove("hide");
+  const group = getItemFromLocalStorageUsingIndex(groupId, "groups");
+  const members = group.users;
+
+  const usernames = members.map((member) => {
+    const memberDetails = getItemFromLocalStorageUsingIndex(member, "users");
+
+    return memberDetails.username;
+  });
+  renderMembers(usernames);
+}
+
+function renderMembers(usernames) {
+  const groupMembersModal = document.querySelector("#group-users-list-modal");
+  groupMembersModal.innerHTML = "";
+  const userName = document.createElement("div");
+  userName.classList.add("user-name-container");
+  usernames.forEach((username) => {
+    const paratag = document.createElement("p");
+    paratag.classList.add("member");
+    paratag.textContent = username;
+    userName.append(paratag);
+  });
+
+  groupMembersModal.append(userName);
+}
+
 function deleteGroup(event) {
   const target = event.target;
 
