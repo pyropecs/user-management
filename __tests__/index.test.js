@@ -1023,5 +1023,81 @@ describe("role management", () => {
     expect(roleManagementTitle).toBeInTheDocument();
     const newRoleButton = getByRole(roleManagementPage, "button");
     expect(newRoleButton.textContent).toBe("New Role");
+    const roleTableId = getByText(roleManagementPage, /Role Id/);
+    expect(roleTableId).toBeInTheDocument();
+    const roleTableName = getByText(roleManagementPage, /Role Name/);
+    expect(roleTableName).toBeInTheDocument();
+    const roleTableDescriptions = getByText(roleManagementPage, /Description/);
+    expect(roleTableDescriptions).toBeInTheDocument();
+    const roleTableActions = getByText(roleManagementPage, /Actions/);
+    expect(roleTableActions).toBeInTheDocument();
+  });
+  test("to check that clicking new role button should open the modal", () => {
+    const newGroupBtn = document.querySelector("#create-role-btn-id");
+
+    fireEvent(newGroupBtn, new Event("click"));
+
+    const modalRoleWrap = document.querySelector("#role-form");
+    expect(modalRoleWrap.classList.contains("hide")).toBeFalsy();
+  });
+
+  test("to check that role Group contains necessary components in it", () => {
+    const roleForm = document.querySelector("#role-form");
+    const createRoleTitle = getByText(roleForm, /Create Role/);
+    expect(createRoleTitle).toBeInTheDocument();
+    const roleInput = getByPlaceholderText(roleForm, /Enter Role/);
+    expect(roleInput).toBeInTheDocument();
+    const roleDescription = getByPlaceholderText(roleForm, /Enter Description/);
+    expect(roleDescription).toBeInTheDocument();
+    const createRoleBtn = document.querySelector("#submit-role-btn");
+    expect(createRoleBtn.disabled).toBeFalsy();
+    expect(createRoleBtn).toBeInTheDocument();
+  });
+
+  test("the role should be created when valid input is entered", () => {
+    const validRoleName = chance.string({
+      symbols: false,
+      numeric: true,
+      alpha: true,
+    });
+    const validRoleDescription = chance.string();
+    const roleInput = document.querySelector("#rolename-input");
+    roleInput.value = validRoleName;
+    const roleDescriptionInput = document.querySelector(
+      "#role-description-input"
+    );
+    roleDescriptionInput.value = validRoleDescription;
+    const createRoleBtn = document.querySelector("#submit-role-btn");
+    const roleNameError = document.querySelector("#role-error");
+    const roleDescriptionError = document.querySelector(
+      "#role-description-error"
+    );
+    expect(roleNameError.textContent).toBe("");
+    expect(roleDescriptionError.textContent).toBe("");
+    fireEvent.click(createRoleBtn);
+    expect(
+      queryByText(document.body, /Role Created Successfully/)
+    ).not.toBeNull();
+    const item = JSON.parse(localStorage.getItem("roles"));
+    expect(roleNameError.textContent).toBe("");
+    expect(item[0].rolename).toBe(validRoleName);
+    expect(item[0].description).toBe(description);
+    const roleName = getByText(document.body, validRoleName);
+    expect(roleName).toBeInTheDocument();
+  });
+
+  test("the error should be displayed when invalid group name is entered", () => {
+    const invalidRoleName = "";
+    const inputform = document.querySelector("#rolename-input");
+    inputform.value = invalidRoleName;
+    const createRoleBtn = document.querySelector("#submit-role-btn");
+    const roleNameError = document.querySelector("#rolename-error");
+    const roleDescriptionError = document.querySelector(
+      "#role-description-error"
+    );
+    expect(roleNameError.textContent).toBe("");
+    fireEvent.click(createRoleBtn);
+    expect(roleNameError.textContent).toBe("Role name is required");
+    expect(roleDescriptionError.textContent).toBe("Role description is required");
   });
 });

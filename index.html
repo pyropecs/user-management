@@ -65,9 +65,19 @@
     <div id="role-management-page" class="main hide">
       <h2 class="title">Role Management System</h2>
       <div class="button-container">
-        <button id="create-group-btn-id" class="create-btn">New Role</button>
+        <button id="create-role-btn-id" class="create-btn">New Role</button>
       </div>
-
+      <table class="user-table" id="user-table-id">
+        <thead class="table-header">
+          <tr>
+            <th>Role Id</th>
+            <th>Role Name</th>
+            <th>Actions</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody class="user-table-body" id="group-table-body"></tbody>
+      </table>
     </div>
 
     <div class="wrap hide" id="user-form">
@@ -169,6 +179,39 @@
       </div>
 
     </div>
+
+    <div class="wrap hide" id="role-form">
+
+      <div class="create-form-container"  id="create-role-form-container">
+        <h1 >Create Role</h1>
+        <form id="role-submit-form" class="user-form">
+          <div class="input-container">
+            <input
+              type="text"
+              name="role-name"
+              placeholder="Enter Role"
+              title="role name"
+              id="rolename-input"
+            />
+            <span class="error hide" id="role-error"></span>
+          </div>
+          <div class="input-container">
+            <input
+              type="text"
+              name="description-role"
+              placeholder="Enter Description"
+              title="role description"
+              id="role-description-input"
+            />
+            <span class="error hide" id="role-description-error"></span>
+          </div>
+          <button type="submit" class="add-btn" id="submit-role-btn">
+            Add Role
+          </button>
+        </form>
+      </div>
+    </div>
+
     <div class="success-msg hide" id="show-success-id">
       
       <img src="./Images/check.png" alt="user added" />

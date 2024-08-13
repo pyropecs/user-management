@@ -26,9 +26,17 @@ const groupNameInput = document.querySelector("#groupname-input");
 const groupNameError = document.querySelector("#groupname-error");
 const groupSubmitForm = document.querySelector("#group-submit-form");
 const userListModal = document.querySelector("#group-users-form");
-
 const multiUserSelect = document.querySelector("#multi-user-select");
 const groupMembers = document.querySelector("#group-users-list");
+//role management page variables
+
+const createRoleBtn = document.querySelector("#create-role-btn-id");
+const roleForm = document.querySelector("#role-form");
+const roleSubmitForm = document.querySelector("#role-submit-form")
+const roleInput = document.querySelector("#rolename-input");
+const roleDescriptionInput = document.querySelector(
+  "#role-description-input"
+);
 multiUserSelect.addEventListener("click", showCheckboxes);
 toggleBtnId.addEventListener("click", toggleNav);
 window.addEventListener("DOMContentLoaded", renderUsers);
@@ -53,7 +61,9 @@ roleManagementBtn.addEventListener("click", () => {
 createGroupBtn.addEventListener("click", () => {
   groupForm.classList.remove("hide");
 });
-
+createRoleBtn.addEventListener("click", () => {
+  roleForm.classList.remove("hide");
+});
 userName.addEventListener("input", () => {
   userNameError.textContent = "";
 });
@@ -98,6 +108,13 @@ window.addEventListener("mouseup", (event) => {
 
   if (!multiuserSelect.contains(event.target)) {
     groupMembers.classList.add("hide");
+  }
+});
+window.addEventListener("mouseup", (event) => {
+  const roleSubmitForm = document.querySelector("#role-submit-form");
+
+  if (!roleSubmitForm.contains(event.target)) {
+    roleForm.classList.add("hide");
   }
 });
 
@@ -572,3 +589,20 @@ function checkUserisAlreadyAMember(groupId, userId) {
   const members = group.users;
   return members.includes(userId);
 }
+
+roleSubmitForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const value = roleInput.value;
+  const isValid = validateGroupName(value);
+  if (isValid) {
+    const group = {
+      id: getIndexFromLocalStorage("groups"),
+      groupname: value,
+      users: [],
+    };
+    saveToLocalStorage("groups", group);
+    showSuccess("Group Created Successfully");
+    renderGroups();
+    groupForm.classList.add("hide");
+  }
+});
