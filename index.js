@@ -37,6 +37,7 @@ const roleInput = document.querySelector("#rolename-input");
 const roleDescriptionInput = document.querySelector("#role-description-input");
 const roleUsersForm = document.querySelector("#role-users-form");
 const roleGroupForm = document.querySelector("#role-groups-form");
+const viewAssigneesModal = document.querySelector("#role-assignees");
 multiUserSelect.addEventListener("click", showCheckboxes);
 toggleBtnId.addEventListener("click", toggleNav);
 window.addEventListener("DOMContentLoaded", renderUsers);
@@ -126,7 +127,6 @@ window.addEventListener("mouseup", (event) => {
   }
 });
 
-
 window.addEventListener("mouseup", (event) => {
   const roleSubmitForm = document.querySelector("#multi-group-select-role");
 
@@ -135,6 +135,13 @@ window.addEventListener("mouseup", (event) => {
   }
 });
 
+window.addEventListener("mouseup", (event) => {
+  const viewAssigneesContainer = document.querySelector("#view-assignees-id");
+
+  if (!viewAssigneesContainer.contains(event.target)) {
+    viewAssigneesModal.classList.add("hide");
+  }
+});
 
 createForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -230,6 +237,11 @@ function validateEmail(emailValue) {
     addError(emailError);
     return false;
   }
+  if(checkPropertyValueExists("email",emailValue,"users")){
+    emailError.textContent = "Email Already Exists";
+    addError(emailError);
+    return false;
+  }
   return true;
 }
 
@@ -275,6 +287,13 @@ function validateUserName(userNameValue) {
     addError(userNameError);
     return false;
   }
+  if(checkPropertyValueExists("username",userNameValue,"users")){
+    userNameError.textContent = "Username Already Exists";
+    addError(userNameError);
+    return false;
+  }
+
+
   return true;
 }
 
@@ -579,8 +598,8 @@ multiUserSelect.addEventListener("submit", (e) => {
   showSuccess("Members in group is Updated Successfully");
   userListModal.classList.add("hide");
 });
-const multiGroupSelect = document.querySelector("#multi-group-select-role")
-multiGroupSelect.addEventListener("submit",(e)=>{
+const multiGroupSelect = document.querySelector("#multi-group-select-role");
+multiGroupSelect.addEventListener("submit", (e) => {
   e.preventDefault();
   const checkboxes = Array.from(document.querySelectorAll(".checkbox"));
   const checkedCheckboxes = checkboxes.filter((checkbox) => {
@@ -599,7 +618,7 @@ multiGroupSelect.addEventListener("submit",(e)=>{
   updateTodotoLocalStorage(updatedRole, "roles");
   showSuccess("Groups in Role is Updated Successfully");
   roleGroupForm.classList.add("hide");
-})
+});
 
 function renderCheckboxes(checkBoxContainer, id, key) {
   checkBoxContainer.innerHTML = "";
@@ -715,6 +734,7 @@ function createTableRoleRow(role) {
   tableRow.innerHTML = `
 <td>${String(id)}</td>
 <td id="role-name">${rolename}</td>
+<td><button id="role-assignees-btn">View Assignees</button> </td>
 <td>${description}</td>
 
 <td> <div class="btn-group-container">  <button class="add-user" id="add-role-users" >Add Role to Users</button><button class="view-user" id="add-role-group"  >Add Role to Groups</button>  </div> </td> 
@@ -722,13 +742,13 @@ function createTableRoleRow(role) {
   // const deleteBtn = tableRow.querySelector(".delete-group-btn");
   const addUsersToRoleBtn = tableRow.querySelector("#add-role-users");
   const addGroupsToRoleBtn = tableRow.querySelector("#add-role-group");
-  // const viewMemBtn = tableRow.querySelector(".view-user");
-  // viewMemBtn.addEventListener("click", () => {
-  //   viewMembers(id);
-  // });
-  // deleteBtn.addEventListener("click", deleteGroup);
+  const viewAssigneesBtn = tableRow.querySelector("#role-assignees-btn");
+
   addUsersToRoleBtn.addEventListener("click", addUsersToRole);
   addGroupsToRoleBtn.addEventListener("click", addGroupsToRole);
+  viewAssigneesBtn.addEventListener("click", () => {
+    viewAssignees(id);
+  });
   return tableRow;
 }
 
@@ -742,6 +762,55 @@ function addUsersToRole(event) {
   renderCheckboxes(roleCheckBoxes, roleId, "roles");
 }
 
+function viewAssignees(roleId) {
+  viewAssigneesModal.classList.remove("hide");
+  groupMembers.classList.remove("hide");
+  const role = getItemFromLocalStorageUsingIndex(roleId, "roles");
+  const members = role.users;
+  const groups = role.groups;
+  const usernames = members.map((member) => {
+    const memberDetails = getItemFromLocalStorageUsingIndex(member, "users");
+
+    return memberDetails.username;
+  });
+  const groupNames = members.map((member) => {
+    const memberDetails = getItemFromLocalStorageUsingIndex(member, "groups");
+
+    return memberDetails.groupname;
+  });
+  renderRoleMembers(usernames);
+  renderRoleGroups(groupNames)
+}
+
+function renderRoleMembers(usernames) {
+  const groupMembersModal = document.querySelector("#users-list");
+  groupMembersModal.innerHTML = "";
+  const userName = document.createElement("div");
+  userName.classList.add("user-name-container");
+  usernames.forEach((username) => {
+    const paratag = document.createElement("p");
+    paratag.classList.add("member");
+    paratag.textContent = username;
+    userName.append(paratag);
+  });
+
+  groupMembersModal.append(userName);
+}
+function renderRoleGroups(groupnames) {
+  const groupMembersModal = document.querySelector("#groups-list");
+  groupMembersModal.innerHTML = "";
+  const groupName = document.createElement("div");
+  groupName.classList.add("group-name-container");
+  groupnames.forEach((groupname) => {
+    const paratag = document.createElement("p");
+    paratag.classList.add("member");
+    paratag.textContent = groupname;
+    groupName.append(paratag);
+  });
+
+  groupMembersModal.append(groupName);
+}
+
 function addGroupsToRole(event) {
   roleGroupForm.classList.remove("hide");
   const target = event.target;
@@ -749,7 +818,7 @@ function addGroupsToRole(event) {
   const roleId = tableRow.getAttribute("id");
   roleGroupForm.setAttribute("role-id", roleId);
   const roleCheckBoxes = document.querySelector("#role-group-checkboxes");
-  renderGroupCheckboxes(roleCheckBoxes,roleId,"roles")
+  renderGroupCheckboxes(roleCheckBoxes, roleId, "roles");
 }
 
 function renderGroupCheckboxes(checkBoxContainer, id, key) {
@@ -759,7 +828,11 @@ function renderGroupCheckboxes(checkBoxContainer, id, key) {
     const label = document.createElement("label");
     label.classList.add("checkbox");
 
-    const isAlreadyMember = checkUserisAlreadyAMember(id, String(group.id), key);
+    const isAlreadyMember = checkUserisAlreadyAMember(
+      id,
+      String(group.id),
+      key
+    );
 
     label.innerHTML = `<input type="checkbox" ${
       isAlreadyMember ? "checked" : ""
@@ -767,10 +840,6 @@ function renderGroupCheckboxes(checkBoxContainer, id, key) {
     checkBoxContainer.append(label);
   });
 }
-
-
-
-
 
 const searchInput = document.querySelector("#search-role");
 searchInput.addEventListener("input", () => {
@@ -790,3 +859,25 @@ searchInput.addEventListener("input", () => {
   });
 });
 
+function checkPropertyValueExists(property, value,key) {
+
+  const usersJson = localStorage.getItem(key);
+  
+ 
+  if (usersJson) {
+      try {
+          const usersArray = JSON.parse(usersJson);
+
+        
+          for (const user of usersArray) {
+              if (user[property] === value) {
+                  return true; 
+              }
+          }
+      } catch (e) {
+          console.error('Error parsing JSON from localStorage:', e);
+      }
+  }
+  
+  return false; 
+}
