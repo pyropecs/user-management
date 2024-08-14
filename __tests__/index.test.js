@@ -765,7 +765,7 @@ describe("group managment ", () => {
   });
 });
 
-describe("add users functionality", () => {
+describe("add users functionality to a group", () => {
   const validGroupName = chance.string();
 
   function createUser(userDetails) {
@@ -835,7 +835,7 @@ describe("add users functionality", () => {
     const addUser = getByText(tableRow, /Add Users\/Remove Users/);
     expect(addUser).toBeInTheDocument();
     fireEvent.click(addUser);
-    const checkboxes = document.querySelector("#checkboxes");
+    const checkboxes = document.querySelector("#user-checkboxes");
     const user = getByText(checkboxes, users[0]);
     expect(user).toBeInTheDocument();
   });
@@ -867,7 +867,7 @@ describe("add users functionality", () => {
     const tableRow = groupName.parentElement.parentElement;
     const addUser = getByText(tableRow, /Add Users\/Remove Users/);
     fireEvent.click(addUser);
-    const checkboxes = document.querySelector("#checkboxes");
+    const checkboxes = document.querySelector("#user-checkboxes");
     const user = getByText(checkboxes, users[1]);
     const userAddBtn = document.querySelector("#user-add-btn");
     expect(userAddBtn).toBeInTheDocument();
@@ -890,6 +890,8 @@ describe("add users functionality", () => {
 
   describe("to test existing members in that group", () => {
     const users = [];
+    let checkboxes = document.querySelector("#user-checkboxes");
+
     const numberOfUsers = 3;
     beforeEach(() => {
       for (let i = 0; i < numberOfUsers; i++) {
@@ -920,7 +922,7 @@ describe("add users functionality", () => {
       const tableRow = groupName.parentElement.parentElement;
       const addUser = getByText(tableRow, /Add Users\/Remove Users/);
       fireEvent.click(addUser);
-      const checkboxes = document.querySelector("#checkboxes");
+      checkboxes = document.querySelector("#user-checkboxes");
       const user = getByText(checkboxes, users[1]);
       const userAddBtn = document.querySelector("#user-add-btn");
       let updatedUser = getByText(checkboxes, users[1]);
@@ -981,7 +983,7 @@ describe("add users functionality", () => {
       const tableRow = groupName.parentElement.parentElement;
       const addUser = getByText(tableRow, /Add Users\/Remove Users/);
       fireEvent.click(addUser);
-      const checkboxes = document.querySelector("#checkboxes");
+      const checkboxes = document.querySelector("#user-checkboxes");
       const user = getByText(checkboxes, users[1]);
       const userAddBtn = document.querySelector("#user-add-btn");
       let updatedUser = getByText(checkboxes, users[1]);
@@ -1087,8 +1089,8 @@ describe("role management", () => {
 
     expect(roleName).toBeInTheDocument();
     const tableRow = roleName.parentElement;
-    expect(getByText(tableRow, /Add Roles to User/)).toBeInTheDocument();
-    expect(getByText(tableRow, /Add Roles to Group/)).toBeInTheDocument();
+    expect(getByText(tableRow, /Add Role to Users/)).toBeInTheDocument();
+    expect(getByText(tableRow, /Add Role to Groups/)).toBeInTheDocument();
     expect(getByText(tableRow, /delete role/)).toBeInTheDocument();
   });
 
@@ -1141,7 +1143,7 @@ describe("role management", () => {
     });
     test("to test that search filter displays the roles that only contain filter input", async () => {
       // const searchRole = document.querySelector("#search-role");
-      // await userEvent.type(searchRole, roles[0].slice(0, 1));
+      // await userEvent.type(searchRole, roles[0].slice(0,2));
       // await waitFor(() => {
       //   const roleTableBody = document.querySelector("#role-table-body");
       //   const rolesTags = roleTableBody.querySelectorAll("#role-name");
@@ -1150,5 +1152,146 @@ describe("role management", () => {
       //   ).toBeFalsy();
       // });
     });
+  });
+});
+
+describe("add role to multiple users", () => {
+  const role = {
+    name: chance.string({ numeric: false, alpha: true, numeric: false }),
+    description: chance.string({ numeric: false, alpha: true, numeric: true }),
+  };
+  const users = [];
+  const numberOfUsers = 5;
+  function createUser(userDetails) {
+    const lastName = document.querySelector("#lastname-input");
+    const userForm = document.querySelector("#user-form");
+    const lastNameValue = userDetails.lastName;
+    lastName.value = lastNameValue;
+    const firstName = document.querySelector("#firstname-input");
+    const firstNameValue = userDetails.firstName;
+    firstName.value = firstNameValue;
+    const email = document.querySelector("#email-input");
+    const emailValue = userDetails.email;
+    email.value = emailValue;
+    const userName = document.querySelector("#username-input");
+    const userNameValue = userDetails.username;
+    userName.value = userNameValue;
+    const addUser = getByText(userForm, /Add User/);
+    addUser.click();
+  }
+  function createRoles(validRoleName, validRoleDescription) {
+    const roleInput = document.querySelector("#rolename-input");
+    roleInput.value = validRoleName;
+    const roleDescriptionInput = document.querySelector(
+      "#role-description-input"
+    );
+    roleDescriptionInput.value = validRoleDescription;
+    const createRoleBtn = document.querySelector("#submit-role-btn");
+    const roleNameError = document.querySelector("#role-error");
+    const roleDescriptionError = document.querySelector(
+      "#role-description-error"
+    );
+    expect(roleNameError.textContent).toBe("");
+    expect(roleDescriptionError.textContent).toBe("");
+    fireEvent.click(createRoleBtn);
+  }
+  beforeEach(() => {
+
+
+    createRoles(role.name, role.description);
+  });
+
+  test("the new users should be added to the a particular role", () => {
+    const userListModal = document.querySelector("#role-users-form");
+    expect(userListModal).toBeInTheDocument();
+    const roleName = getByText(document.body, role.name);
+    const tableRow = roleName.parentElement;
+    const addUser = getByText(tableRow, /Add Role to Users/);
+    expect(addUser).toBeInTheDocument();
+    expect(userListModal.classList.contains("hide")).toBeTruthy();
+    fireEvent.click(addUser);
+    expect(userListModal.classList.contains("hide")).toBeFalsy();
+  });
+
+  test("to check that list of registered users shown in the drop down", () => {
+    const users = [];
+    const numberOfUsers = 5;
+    for (let i = 0; i < numberOfUsers; i++) {
+      const userDetails = {
+        lastName: chance.string({
+          symbols: false,
+          numeric: false,
+          alpha: true,
+        }),
+        firstName: chance.string({
+          symbols: false,
+          numeric: false,
+          alpha: true,
+        }),
+        email: chance.email(),
+        username: chance.string({ symbols: false, numeric: true, alpha: true }),
+      };
+
+      createUser(userDetails);
+      users.push(userDetails.username);
+    }
+    const roleName = getByText(document.body, role.name);
+    const tableRow = roleName.parentElement.parentElement;
+    const addUser = getByText(tableRow, /Add Role to Users/);
+    expect(addUser).toBeInTheDocument();
+    fireEvent.click(addUser);
+    const checkboxes = document.querySelector("#role-checkboxes");
+    const user = getByText(checkboxes, users[0]);
+    expect(user).toBeInTheDocument();
+  });
+
+  test("to check that list of users should be added in the particular role  ", () => {
+
+    const numberOfUsers = 3;
+    for (let i = 0; i < numberOfUsers; i++) {
+      const userDetails = {
+        lastName: chance.string({
+          symbols: false,
+          numeric: false,
+          alpha: true,
+        }),
+        firstName: chance.string({
+          symbols: false,
+          numeric: false,
+          alpha: true,
+        }),
+        email: chance.email(),
+        username: chance.string({ symbols: false, numeric: true, alpha: true }),
+      };
+
+      createUser(userDetails);
+      users.push(userDetails.username);
+    }
+
+    const roleName = getByText(document.body, role.name);
+    const tableRow = roleName.parentElement.parentElement;
+    const addUser = getByText(tableRow, /Add Role to Users/);
+    fireEvent.click(addUser);
+    const checkboxes = document.querySelector("#role-checkboxes");
+  
+    const user = getByText(checkboxes, users[0]);
+    const userAddBtn = document.querySelector("#user-role-add-btn");
+    expect(userAddBtn).toBeInTheDocument();
+    fireEvent.click(user);
+    fireEvent.click(userAddBtn);
+
+    expect(JSON.parse(localStorage.getItem("roles"))).toStrictEqual([
+      {
+        id: 0,
+        rolename: role.name,
+        description: role.description,
+        users: ["0"],
+      },
+    ]);
+    expect(
+      queryByText(document.body, /Members in role is Updated Successfully/)
+    ).not.toBeNull();
+    const userListModal = document.querySelector("#role-users-form");
+    expect(userListModal.classList.contains("hide")).toBeTruthy();
   });
 });
