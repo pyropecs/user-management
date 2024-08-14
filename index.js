@@ -35,7 +35,8 @@ const roleForm = document.querySelector("#role-form");
 const roleSubmitForm = document.querySelector("#role-submit-form");
 const roleInput = document.querySelector("#rolename-input");
 const roleDescriptionInput = document.querySelector("#role-description-input");
-const roleUsersForm = document.querySelector("#role-users-form")
+const roleUsersForm = document.querySelector("#role-users-form");
+const roleGroupForm = document.querySelector("#role-groups-form");
 multiUserSelect.addEventListener("click", showCheckboxes);
 toggleBtnId.addEventListener("click", toggleNav);
 window.addEventListener("DOMContentLoaded", renderUsers);
@@ -124,6 +125,16 @@ window.addEventListener("mouseup", (event) => {
     roleUsersForm.classList.add("hide");
   }
 });
+
+
+window.addEventListener("mouseup", (event) => {
+  const roleSubmitForm = document.querySelector("#multi-group-select-role");
+
+  if (!roleSubmitForm.contains(event.target)) {
+    roleGroupForm.classList.add("hide");
+  }
+});
+
 
 createForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -544,7 +555,7 @@ function addAndRemoveUsersFromGroup(event) {
   const groupId = tableRow.getAttribute("id");
   userListModal.setAttribute("group-id", groupId);
   const checkBoxContainer = document.querySelector("#user-checkboxes");
-  renderCheckboxes(checkBoxContainer,groupId,"groups");
+  renderCheckboxes(checkBoxContainer, groupId, "groups");
 }
 
 multiUserSelect.addEventListener("submit", (e) => {
@@ -568,16 +579,36 @@ multiUserSelect.addEventListener("submit", (e) => {
   showSuccess("Members in group is Updated Successfully");
   userListModal.classList.add("hide");
 });
+const multiGroupSelect = document.querySelector("#multi-group-select-role")
+multiGroupSelect.addEventListener("submit",(e)=>{
+  e.preventDefault();
+  const checkboxes = Array.from(document.querySelectorAll(".checkbox"));
+  const checkedCheckboxes = checkboxes.filter((checkbox) => {
+    return checkbox.checked === true;
+  });
+  const groupIndex = checkedCheckboxes.map((checkedCheckbox) => {
+    const id = checkedCheckbox.getAttribute("id");
+    return id;
+  });
+  const roleId = roleGroupForm.getAttribute("role-id");
+  const group = getItemFromLocalStorageUsingIndex(roleId, "roles");
+  const updatedRole = {
+    ...group,
+    groups: groupIndex,
+  };
+  updateTodotoLocalStorage(updatedRole, "roles");
+  showSuccess("Groups in Role is Updated Successfully");
+  roleGroupForm.classList.add("hide");
+})
 
-function renderCheckboxes(checkBoxContainer,id,key) {
- 
+function renderCheckboxes(checkBoxContainer, id, key) {
   checkBoxContainer.innerHTML = "";
   const users = getFromLocalStorage("users");
   users.forEach((user) => {
     const label = document.createElement("label");
     label.classList.add("checkbox");
-    
-    const isAlreadyMember = checkUserisAlreadyAMember(id, String(user.id),key);
+
+    const isAlreadyMember = checkUserisAlreadyAMember(id, String(user.id), key);
 
     label.innerHTML = `<input type="checkbox" ${
       isAlreadyMember ? "checked" : ""
@@ -592,10 +623,10 @@ function showCheckboxes(e) {
   const checkboxes = document.querySelector("#user-checkboxes");
   checkboxes.style.display = "flex";
 }
-function checkUserisAlreadyAMember(groupId, userId,key) {
+function checkUserisAlreadyAMember(groupId, userId, key) {
   const group = getItemFromLocalStorageUsingIndex(groupId, key);
   const members = group.users;
-console.log(group,userId)
+  console.log(group, userId);
   return members.includes(userId);
 }
 
@@ -611,7 +642,7 @@ roleSubmitForm.addEventListener("submit", (e) => {
       id: getIndexFromLocalStorage("roles"),
       rolename: roleInputValue,
       description: roledescriptionValue,
-      users:[]
+      users: [],
     };
     saveToLocalStorage("roles", role);
     showSuccess("Role Created Successfully");
@@ -686,32 +717,58 @@ function createTableRoleRow(role) {
 <td id="role-name">${rolename}</td>
 <td>${description}</td>
 
-<td> <div class="btn-group-container">  <button class="add-user" id="add-role-users" >Add Role to Users</button><button class="view-user" id="add-role-group"  >Add Role to Groups</button> <button class="delete-group-btn"  >delete role</button>  </div> </td> 
+<td> <div class="btn-group-container">  <button class="add-user" id="add-role-users" >Add Role to Users</button><button class="view-user" id="add-role-group"  >Add Role to Groups</button>  </div> </td> 
 `;
   // const deleteBtn = tableRow.querySelector(".delete-group-btn");
   const addUsersToRoleBtn = tableRow.querySelector("#add-role-users");
+  const addGroupsToRoleBtn = tableRow.querySelector("#add-role-group");
   // const viewMemBtn = tableRow.querySelector(".view-user");
   // viewMemBtn.addEventListener("click", () => {
   //   viewMembers(id);
   // });
   // deleteBtn.addEventListener("click", deleteGroup);
-  addUsersToRoleBtn.addEventListener(
-    "click",
-    addUsersToRole
-  );
+  addUsersToRoleBtn.addEventListener("click", addUsersToRole);
+  addGroupsToRoleBtn.addEventListener("click", addGroupsToRole);
   return tableRow;
 }
 
-function addUsersToRole(event){
-
+function addUsersToRole(event) {
   roleUsersForm.classList.remove("hide");
   const target = event.target;
   const tableRow = target.parentElement.parentElement.parentElement;
   const roleId = tableRow.getAttribute("id");
   userListModal.setAttribute("role-id", roleId);
-  const roleCheckBoxes = document.querySelector("#role-checkboxes")
-  renderCheckboxes(roleCheckBoxes,roleId,"roles");
+  const roleCheckBoxes = document.querySelector("#role-checkboxes");
+  renderCheckboxes(roleCheckBoxes, roleId, "roles");
 }
+
+function addGroupsToRole(event) {
+  roleGroupForm.classList.remove("hide");
+  const target = event.target;
+  const tableRow = target.parentElement.parentElement.parentElement;
+  const roleId = tableRow.getAttribute("id");
+  roleGroupForm.setAttribute("role-id", roleId);
+  const roleCheckBoxes = document.querySelector("#role-group-checkboxes");
+  renderGroupCheckboxes(roleCheckBoxes,roleId,"roles")
+}
+
+function renderGroupCheckboxes(checkBoxContainer, id, key) {
+  checkBoxContainer.innerHTML = "";
+  const groups = getFromLocalStorage("groups");
+  groups.forEach((group) => {
+    const label = document.createElement("label");
+    label.classList.add("checkbox");
+
+    const isAlreadyMember = checkUserisAlreadyAMember(id, String(group.id), key);
+
+    label.innerHTML = `<input type="checkbox" ${
+      isAlreadyMember ? "checked" : ""
+    }  class="checkbox" id=${group.id} />${group.groupname}</label>`;
+    checkBoxContainer.append(label);
+  });
+}
+
+
 
 
 
@@ -722,15 +779,14 @@ searchInput.addEventListener("input", () => {
   const items = document.querySelectorAll("#role-name");
 
   items.forEach((item) => {
-    const text = item.textContent.toLowerCase();
+    const text = item.textContent;
 
     const tableRow = item.parentElement;
     if (text.includes(searchTerm)) {
-      console.log(tableRow);
-
       tableRow.classList.remove("hide");
     } else {
       tableRow.classList.add("hide");
     }
   });
 });
+

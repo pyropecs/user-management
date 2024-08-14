@@ -1091,7 +1091,6 @@ describe("role management", () => {
     const tableRow = roleName.parentElement;
     expect(getByText(tableRow, /Add Role to Users/)).toBeInTheDocument();
     expect(getByText(tableRow, /Add Role to Groups/)).toBeInTheDocument();
-    expect(getByText(tableRow, /delete role/)).toBeInTheDocument();
   });
 
   test("the error should be displayed when invalid group name is entered", () => {
@@ -1142,15 +1141,23 @@ describe("role management", () => {
       }
     });
     test("to test that search filter displays the roles that only contain filter input", async () => {
-      // const searchRole = document.querySelector("#search-role");
-      // await userEvent.type(searchRole, roles[0].slice(0,2));
-      // await waitFor(() => {
-      //   const roleTableBody = document.querySelector("#role-table-body");
-      //   const rolesTags = roleTableBody.querySelectorAll("#role-name");
-      //   expect(
-      //     rolesTags[0].parentElement.classList.contains("hide")
-      //   ).toBeFalsy();
-      // });
+      const searchRole = document.querySelector("#search-role");
+      const roleTableBody = document.querySelector("#role-table-body");
+      await userEvent.type(searchRole, roles[0]);
+      await waitFor(() => {
+        const rolesTags = roleTableBody.querySelectorAll("#role-name");
+        rolesTags.forEach((roleTag, index) => {
+          if (index === 0) {
+            expect(
+              roleTag.parentElement.classList.contains("hide")
+            ).toBeFalsy();
+          } else {
+            expect(
+              roleTag.parentElement.classList.contains("hide")
+            ).toBeTruthy();
+          }
+        });
+      });
     });
   });
 });
@@ -1196,8 +1203,6 @@ describe("add role to multiple users", () => {
     fireEvent.click(createRoleBtn);
   }
   beforeEach(() => {
-
-
     createRoles(role.name, role.description);
   });
 
@@ -1246,7 +1251,6 @@ describe("add role to multiple users", () => {
   });
 
   test("to check that list of users should be added in the particular role  ", () => {
-
     const numberOfUsers = 3;
     for (let i = 0; i < numberOfUsers; i++) {
       const userDetails = {
@@ -1273,7 +1277,7 @@ describe("add role to multiple users", () => {
     const addUser = getByText(tableRow, /Add Role to Users/);
     fireEvent.click(addUser);
     const checkboxes = document.querySelector("#role-checkboxes");
-  
+
     const user = getByText(checkboxes, users[0]);
     const userAddBtn = document.querySelector("#user-role-add-btn");
     expect(userAddBtn).toBeInTheDocument();
@@ -1291,7 +1295,118 @@ describe("add role to multiple users", () => {
     expect(
       queryByText(document.body, /Members in role is Updated Successfully/)
     ).not.toBeNull();
-    const userListModal = document.querySelector("#role-users-form");
-    expect(userListModal.classList.contains("hide")).toBeTruthy();
+    const roleUsersForm = document.querySelector("#role-users-form");
+    expect(roleUsersForm.classList.contains("hide")).toBeTruthy();
+  });
+});
+
+describe("add role to multiple groups", () => {
+  const role = {
+    name: chance.string({ numeric: false, alpha: true, numeric: false }),
+    description: chance.string({ numeric: false, alpha: true, numeric: true }),
+  };
+  const groups = [];
+  const numberOfGroups = 5;
+  function createGroups(groupDetails) {
+    const inputform = document.querySelector("#groupname-input");
+    inputform.value = groupDetails;
+    const createGroupBtn = document.querySelector("#submit-group-btn");
+    fireEvent.click(createGroupBtn);
+  }
+  function createRoles(validRoleName, validRoleDescription) {
+    const roleInput = document.querySelector("#rolename-input");
+    roleInput.value = validRoleName;
+    const roleDescriptionInput = document.querySelector(
+      "#role-description-input"
+    );
+    roleDescriptionInput.value = validRoleDescription;
+    const createRoleBtn = document.querySelector("#submit-role-btn");
+    const roleNameError = document.querySelector("#role-error");
+    const roleDescriptionError = document.querySelector(
+      "#role-description-error"
+    );
+    expect(roleNameError.textContent).toBe("");
+    expect(roleDescriptionError.textContent).toBe("");
+    fireEvent.click(createRoleBtn);
+  }
+  beforeEach(() => {
+    createRoles(role.name, role.description);
+  });
+
+  test("the new users should be added to the a particular role", () => {
+    const roleGroupModal = document.querySelector("#role-groups-form");
+    expect(roleGroupModal).toBeInTheDocument();
+    const roleName = getByText(document.body, role.name);
+    const tableRow = roleName.parentElement;
+    const addUser = getByText(tableRow, /Add Role to Groups/);
+    expect(addUser).toBeInTheDocument();
+    expect(roleGroupModal.classList.contains("hide")).toBeTruthy();
+    fireEvent.click(addUser);
+    expect(roleGroupModal.classList.contains("hide")).toBeFalsy();
+  });
+
+  test("to check that list of registered groups shown in the drop down", () => {
+    const groups = [];
+    const numberOfGroups = 5;
+    for (let i = 0; i < numberOfGroups; i++) {
+      const groupDetails = {
+        groupname: chance.string({
+          symbols: false,
+          numeric: false,
+          alpha: true,
+        }),
+      };
+
+      createGroups(groupDetails.groupname);
+      groups.push(groupDetails.groupname);
+    }
+    const roleName = getByText(document.body, role.name);
+    const tableRow = roleName.parentElement.parentElement;
+    const addUser = getByText(tableRow, /Add Role to Groups/);
+    expect(addUser).toBeInTheDocument();
+    fireEvent.click(addUser);
+    const checkboxes = document.querySelector("#role-group-checkboxes");
+    const user = getByText(checkboxes, groups[0]);
+    expect(user).toBeInTheDocument();
+  });
+
+  test("to check that list of groups should be added in the particular role  ", () => {
+    const groups = [];
+    const numberOfGroups = 3;
+    for (let i = 0; i < numberOfGroups; i++) {
+      const groupDetails = {
+        groupname: chance.string(),
+      };
+
+      createGroups(groupDetails.groupname);
+      groups.push(groupDetails.groupname);
+    }
+
+    const roleName = getByText(document.body, role.name);
+    const tableRow = roleName.parentElement.parentElement;
+    const addGroup = getByText(tableRow, /Add Role to Groups/);
+    fireEvent.click(addGroup);
+    const checkboxes = document.querySelector("#role-group-checkboxes");
+
+    const group = getByText(checkboxes, groups[0]);
+    const groupAddBtn = document.querySelector("#group-role-add-btn");
+    expect(groupAddBtn).toBeInTheDocument();
+    fireEvent.click(group);
+    fireEvent.click(groupAddBtn);
+
+    expect(JSON.parse(localStorage.getItem("roles"))).toStrictEqual([
+      {
+        id: 0,
+        rolename: role.name,
+        description: role.description,
+        users: [],
+        groups: ["0"],
+      },
+    ]);
+    expect(
+      queryByText(document.body, /Groups in Role is Updated Successfully/)
+    ).not.toBeNull();
+    const roleUsersForm = document.querySelector("#role-users-form");
+    expect(roleUsersForm.classList.contains("hide")).toBeTruthy();
   });
 });
