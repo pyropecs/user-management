@@ -64,19 +64,22 @@
     </div>
     <div id="role-management-page" class="main hide">
       <h2 class="title">Role Management System</h2>
-      <div class="button-container">
+      <div class="role-container">
+        <div class="search-input">
+          <input type="text" name="search-role" id="search-role" placeholder="search role"/>
+        </div>
         <button id="create-role-btn-id" class="create-btn">New Role</button>
       </div>
-      <table class="user-table" id="user-table-id">
+      <table class="user-table" id="role-table-id">
         <thead class="table-header">
           <tr>
             <th>Role Id</th>
             <th>Role Name</th>
-            <th>Actions</th>
             <th>Description</th>
+            <th>Actions</th>
           </tr>
         </thead>
-        <tbody class="user-table-body" id="group-table-body"></tbody>
+        <tbody class="user-table-body" id="role-table-body"></tbody>
       </table>
     </div>
 

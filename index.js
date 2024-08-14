@@ -32,15 +32,14 @@ const groupMembers = document.querySelector("#group-users-list");
 
 const createRoleBtn = document.querySelector("#create-role-btn-id");
 const roleForm = document.querySelector("#role-form");
-const roleSubmitForm = document.querySelector("#role-submit-form")
+const roleSubmitForm = document.querySelector("#role-submit-form");
 const roleInput = document.querySelector("#rolename-input");
-const roleDescriptionInput = document.querySelector(
-  "#role-description-input"
-);
+const roleDescriptionInput = document.querySelector("#role-description-input");
 multiUserSelect.addEventListener("click", showCheckboxes);
 toggleBtnId.addEventListener("click", toggleNav);
 window.addEventListener("DOMContentLoaded", renderUsers);
 window.addEventListener("DOMContentLoaded", renderGroups);
+window.addEventListener("DOMContentLoaded", renderRoles);
 userManagementBtn.addEventListener("click", () => {
   userManagementPage.classList.remove("hide");
   groupManagementPage.classList.add("hide");
@@ -592,17 +591,98 @@ function checkUserisAlreadyAMember(groupId, userId) {
 
 roleSubmitForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const value = roleInput.value;
-  const isValid = validateGroupName(value);
-  if (isValid) {
-    const group = {
-      id: getIndexFromLocalStorage("groups"),
-      groupname: value,
-      users: [],
+  const roleInputValue = roleInput.value;
+  const roledescriptionValue = roleDescriptionInput.value;
+
+  const isRoleValid = validateRoleName(roleInputValue);
+  const isDescriptionValid = validateDescription(roledescriptionValue);
+  if (isRoleValid && isDescriptionValid) {
+    const role = {
+      id: getIndexFromLocalStorage("roles"),
+      rolename: roleInputValue,
+      description: roledescriptionValue,
     };
-    saveToLocalStorage("groups", group);
-    showSuccess("Group Created Successfully");
-    renderGroups();
-    groupForm.classList.add("hide");
+    saveToLocalStorage("roles", role);
+    showSuccess("Role Created Successfully");
+    renderRoles();
+    roleForm.classList.add("hide");
   }
+});
+
+function validateRoleName(roleInputValue) {
+  const roleNameError = document.querySelector("#role-error");
+  if (roleInputValue === "") {
+    roleNameError.textContent = "Role name is required";
+    addError(roleNameError);
+    return false;
+  }
+  return true;
+}
+
+function validateDescription(descriptionValue) {
+  const roleDescriptionError = document.querySelector(
+    "#role-description-error"
+  );
+  if (descriptionValue === "") {
+    roleDescriptionError.textContent = "Role description is required";
+    addError(roleDescriptionError);
+    return false;
+  }
+  return true;
+}
+
+function renderRoles() {
+  const roles = getFromLocalStorage("roles");
+
+  const roleTableBody = document.querySelector("#role-table-body");
+  roleTableBody.innerHTML = "";
+  roles.forEach((role) => {
+    const tableRow = createTableRoleRow(role);
+
+    roleTableBody.append(tableRow);
+  });
+}
+function createTableRoleRow(role) {
+  const { id, description, rolename } = role;
+  const tableRow = document.createElement("tr");
+  tableRow.classList.add("user-table-row");
+  tableRow.setAttribute("id", `${id}`);
+  tableRow.innerHTML = `
+<td>${String(id)}</td>
+<td id="role-name">${rolename}</td>
+<td>${description}</td>
+
+<td> <div class="btn-group-container">  <button class="add-user" id="add-group-users" >Add Roles to User</button><button class="view-user"  >Add Roles to Group</button> <button class="delete-group-btn"  >delete role</button>  </div> </td> 
+`;
+  // const deleteBtn = tableRow.querySelector(".delete-group-btn");
+  // const addUsersAndRemoveUsersBtn = tableRow.querySelector("#add-group-users");
+  // const viewMemBtn = tableRow.querySelector(".view-user");
+  // viewMemBtn.addEventListener("click", () => {
+  //   viewMembers(id);
+  // });
+  // deleteBtn.addEventListener("click", deleteGroup);
+  // addUsersAndRemoveUsersBtn.addEventListener(
+  //   "click",
+  //   addAndRemoveUsersFromGroup
+  // );
+  return tableRow;
+}
+const searchInput = document.querySelector("#search-role");
+searchInput.addEventListener("input", () => {
+  const searchTerm = searchInput.value;
+
+  const items = document.querySelectorAll("#role-name");
+
+  items.forEach((item) => {
+    const text = item.textContent.toLowerCase();
+
+    const tableRow = item.parentElement;
+    if (text.includes(searchTerm)) {
+      console.log(tableRow);
+
+      tableRow.classList.remove("hide");
+    } else {
+      tableRow.classList.add("hide");
+    }
+  });
 });

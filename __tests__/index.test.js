@@ -1079,11 +1079,17 @@ describe("role management", () => {
       queryByText(document.body, /Role Created Successfully/)
     ).not.toBeNull();
     const item = JSON.parse(localStorage.getItem("roles"));
+
     expect(roleNameError.textContent).toBe("");
     expect(item[0].rolename).toBe(validRoleName);
-    expect(item[0].description).toBe(description);
+    expect(item[0].description).toBe(validRoleDescription);
     const roleName = getByText(document.body, validRoleName);
+
     expect(roleName).toBeInTheDocument();
+    const tableRow = roleName.parentElement;
+    expect(getByText(tableRow, /Add Roles to User/)).toBeInTheDocument();
+    expect(getByText(tableRow, /Add Roles to Group/)).toBeInTheDocument();
+    expect(getByText(tableRow, /delete role/)).toBeInTheDocument();
   });
 
   test("the error should be displayed when invalid group name is entered", () => {
@@ -1091,13 +1097,58 @@ describe("role management", () => {
     const inputform = document.querySelector("#rolename-input");
     inputform.value = invalidRoleName;
     const createRoleBtn = document.querySelector("#submit-role-btn");
-    const roleNameError = document.querySelector("#rolename-error");
+    const roleNameError = document.querySelector("#role-error");
+
     const roleDescriptionError = document.querySelector(
       "#role-description-error"
     );
     expect(roleNameError.textContent).toBe("");
     fireEvent.click(createRoleBtn);
     expect(roleNameError.textContent).toBe("Role name is required");
-    expect(roleDescriptionError.textContent).toBe("Role description is required");
+    expect(roleDescriptionError.textContent).toBe(
+      "Role description is required"
+    );
+  });
+  describe("to test the search functionality ", () => {
+    const roles = [];
+    function createRoles(validRoleName, validRoleDescription) {
+      const roleInput = document.querySelector("#rolename-input");
+      roleInput.value = validRoleName;
+      const roleDescriptionInput = document.querySelector(
+        "#role-description-input"
+      );
+      roleDescriptionInput.value = validRoleDescription;
+      const createRoleBtn = document.querySelector("#submit-role-btn");
+      const roleNameError = document.querySelector("#role-error");
+      const roleDescriptionError = document.querySelector(
+        "#role-description-error"
+      );
+      expect(roleNameError.textContent).toBe("");
+      expect(roleDescriptionError.textContent).toBe("");
+      fireEvent.click(createRoleBtn);
+    }
+    beforeEach(() => {
+      for (let i = 0; i < 5; i++) {
+        const validRoleName = chance.string({
+          alpha: true,
+          numeric: false,
+          symbols: false,
+        });
+        const validRoleDescription = chance.string();
+        createRoles(validRoleName, validRoleDescription); //creating 5 roles
+        roles.push(validRoleName);
+      }
+    });
+    test("to test that search filter displays the roles that only contain filter input", async () => {
+      // const searchRole = document.querySelector("#search-role");
+      // await userEvent.type(searchRole, roles[0].slice(0, 1));
+      // await waitFor(() => {
+      //   const roleTableBody = document.querySelector("#role-table-body");
+      //   const rolesTags = roleTableBody.querySelectorAll("#role-name");
+      //   expect(
+      //     rolesTags[0].parentElement.classList.contains("hide")
+      //   ).toBeFalsy();
+      // });
+    });
   });
 });

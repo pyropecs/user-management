@@ -294,6 +294,18 @@ input[type="email"] {
   background-color: #298e46;
   box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
 }
+.role-container{
+  
+  width:94%;
+  display: flex;
+ justify-content: flex-end;
+ padding:2%;
+}
+
+.search-input{
+margin-inline: 10%;
+
+}
 
 table,th,tr{
     border-collapse: collapse;
