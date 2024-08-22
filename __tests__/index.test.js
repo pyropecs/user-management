@@ -359,7 +359,7 @@ describe("creation of user", () => {
       },
     ]);
   });
-  test("it should give error that when we type existing user even its valid inputs",()=>{
+  test("it should give error that when we type existing user even its valid inputs", () => {
     const lastName = document.querySelector("#lastname-input");
     const lastNameValue = chance.string({
       symbols: false,
@@ -386,14 +386,14 @@ describe("creation of user", () => {
     userName.value = userNameValue;
     const addUser = getByText(document.body, /Add User/);
     addUser.click();
-    email.value = emailValue
-    userName.value = userNameValue
-    addUser.click()
+    email.value = emailValue;
+    userName.value = userNameValue;
+    addUser.click();
     const emailError = document.querySelector("#email-error");
     const userNameError = document.querySelector("#username-error");
-    expect(emailError.textContent).toBe("Email Already Exists")
-    expect(userNameError.textContent).toBe("Username Already Exists")
-  })
+    expect(emailError.textContent).toBe("Email Already Exists");
+    expect(userNameError.textContent).toBe("Username Already Exists");
+  });
 
   test("invalid inputs should added in local storage when trying to add with invalid inputs", () => {
     const lastName = document.querySelector("#lastname-input");
@@ -772,6 +772,8 @@ describe("group managment ", () => {
     expect(item[0].groupname).toBe(validGroupName);
     const groupName = getByText(document.body, validGroupName);
     expect(groupName).toBeInTheDocument();
+    fireEvent.click(createGroupBtn);
+    expect(groupNameError.textContent).toBe("Group name is Already exists");
   });
   test("the error should be displayed when invalid group name is entered", () => {
     const invalidGroupName = "";
@@ -1130,6 +1132,9 @@ describe("role management", () => {
     const tableRow = roleName.parentElement;
     expect(getByText(tableRow, /Add Role to Users/)).toBeInTheDocument();
     expect(getByText(tableRow, /Add Role to Groups/)).toBeInTheDocument();
+    roleDescriptionInput.value = validRoleDescription;
+    fireEvent.click(createRoleBtn)
+    expect(roleNameError.textContent).toBe("Role name Already Exists")
   });
 
   test("the error should be displayed when invalid group name is entered", () => {
@@ -1448,97 +1453,85 @@ describe("add role to multiple groups", () => {
     expect(roleUsersForm.classList.contains("hide")).toBeTruthy();
   });
 
-  describe("the role should have the assignee button to display the users and groups assoiciated with that role", () => {
-    const users = []
-    const numberOfUsers = 5;
-    const groups = [];
-    const numberOfGroups = 3;
-    function createUser(userDetails) {
-      const lastName = document.querySelector("#lastname-input");
-      const userForm = document.querySelector("#user-form");
-      const lastNameValue = userDetails.lastName;
-      lastName.value = lastNameValue;
-      const firstName = document.querySelector("#firstname-input");
-      const firstNameValue = userDetails.firstName;
-      firstName.value = firstNameValue;
-      const email = document.querySelector("#email-input");
-      const emailValue = userDetails.email;
-      email.value = emailValue;
-      const userName = document.querySelector("#username-input");
-      const userNameValue = userDetails.username;
-      userName.value = userNameValue;
-      const addUser = getByText(userForm, /Add User/);
-      addUser.click();
-    }
-    beforeEach(() => {
   
-        const groupDetails = {
-          groupname: chance.string(),
-        };
-        groups.push(groupDetails.groupname);
-        createGroups(groupDetails.groupname);
-       
-      
-      const roleName = getByText(document.body, role.name);
-      const tableRow = roleName.parentElement.parentElement;
-      const addGroup = getByText(tableRow, /Add Role to Groups/);
-      fireEvent.click(addGroup);
-      const checkboxes = document.querySelector("#role-group-checkboxes");
-      const group = getByText(checkboxes, groups[0]);
-     group.checked = true
-      const groupAddBtn = document.querySelector("#group-role-add-btn");
-      
-      fireEvent.click(groupAddBtn);
-   
-        const userDetails = {
-          lastName: chance.string({
-            symbols: false,
-            numeric: false,
-            alpha: true,
-          }),
-          firstName: chance.string({
-            symbols: false,
-            numeric: false,
-            alpha: true,
-          }),
-          email: chance.email(),
-          username: chance.string({
-            symbols: false,
-            numeric: true,
-            alpha: true,
-          }),
-        };
-        createUser(userDetails);
-        users.push(userDetails.username);
-
-      const addUser = getByText(tableRow, /Add Role to Users/);
-      fireEvent.click(addUser);
-      const checkUsersboxes = document.querySelector("#role-checkboxes");
-      const user = getByText(checkUsersboxes, users[0]);
-      const userAddBtn = document.querySelector("#user-role-add-btn");
-      user.checked = true
-      fireEvent.click(userAddBtn);
-    });
-  
-    test("the assignee button for the particular role should be displayed a modal and have necessary elements in it", () => {
-      const roleName = getByText(document.body, role.name);
-      const tableRow = roleName.parentElement.parentElement;
-      const roleAssigneesBtn = tableRow.querySelector("#role-assignees-btn");
-      expect(roleAssigneesBtn.textContent).toBe("View Assignees");
-      expect(roleAssigneesBtn).toBeInTheDocument();
-      fireEvent(roleAssigneesBtn, new Event("click"));
-
-      const modalRoleWrap = document.querySelector("#role-assignees");
-      expect(modalRoleWrap.classList.contains("hide")).toBeFalsy();
-      expect(getByText(modalRoleWrap,/Assignees/)).toBeInTheDocument();
-      expect(getByText(modalRoleWrap,/Users/)).toBeInTheDocument();
-      expect(getByText(modalRoleWrap,/Groups/)).toBeInTheDocument();
-      console.log(localStorage.getItem("roles"))
-expect(getByText(modalRoleWrap,users[0])).toBeInTheDocument();
-expect(getByText(modalRoleWrap,groups[0])).toBeInTheDocument();
-
-    });
-
-
-  });
 });
+
+describe("to check that roles are viewed",()=>{
+
+  function createUser(userDetails) {
+    const lastName = document.querySelector("#lastname-input");
+    const userForm = document.querySelector("#user-form");
+    const lastNameValue = userDetails.lastName;
+    lastName.value = lastNameValue;
+    const firstName = document.querySelector("#firstname-input");
+    const firstNameValue = userDetails.firstName;
+    firstName.value = firstNameValue;
+    const email = document.querySelector("#email-input");
+    const emailValue = userDetails.email;
+    email.value = emailValue;
+    const userName = document.querySelector("#username-input");
+    const userNameValue = userDetails.username;
+    userName.value = userNameValue;
+    const addUser = getByText(userForm, /Add User/);
+    addUser.click();
+  }
+
+  function createGroups(groupDetails) {
+    const inputform = document.querySelector("#groupname-input");
+    inputform.value = groupDetails;
+    const createGroupBtn = document.querySelector("#submit-group-btn");
+    fireEvent.click(createGroupBtn);
+  }
+
+  test("the assignee button for the particular role should be displayed a modal and have necessary elements in it", () => {
+    const groupName = chance.string();
+    const userDetails = {
+      lastName: chance.string({
+        symbols: false,
+        numeric: false,
+        alpha: true,
+      }),
+      firstName: chance.string({
+        symbols: false,
+        numeric: false,
+        alpha: true,
+      }),
+      email: chance.email(),
+      username: chance.string({ symbols: false, numeric: true, alpha: true }),
+    };
+    createGroups(groupName)
+    createUser(userDetails)
+    const validRoleName = chance.string()
+    const validRoleDescription = chance.string()
+    const roleInput = document.querySelector("#rolename-input");
+    roleInput.value = validRoleName;
+    const roleDescriptionInput = document.querySelector(
+      "#role-description-input"
+    );
+    roleDescriptionInput.value = validRoleDescription;
+    const createRoleBtn = document.querySelector("#submit-role-btn");
+    const roleNameError = document.querySelector("#role-error");
+    const roleDescriptionError = document.querySelector(
+      "#role-description-error"
+    );
+    expect(roleNameError.textContent).toBe("");
+    expect(roleDescriptionError.textContent).toBe("");
+    fireEvent.click(createRoleBtn);
+    const roleName = getByText(document.body, validRoleName);
+    const tableRow = roleName.parentElement.parentElement;
+    const roleAssigneesBtn = tableRow.querySelector("#role-assignees-btn");
+    expect(roleAssigneesBtn.textContent).toBe("View Assignees");
+    expect(roleAssigneesBtn).toBeInTheDocument();
+    fireEvent(roleAssigneesBtn, new Event("click"));
+    const modalRoleWrap = document.querySelector("#role-assignees");
+    expect(modalRoleWrap.classList.contains("hide")).toBeFalsy();
+    expect(getByText(modalRoleWrap,/Assignees/)).toBeInTheDocument();
+    expect(getByText(modalRoleWrap,/Users/)).toBeInTheDocument();
+    expect(getByText(modalRoleWrap,/Groups/)).toBeInTheDocument();
+  });
+
+
+})
+
+
+

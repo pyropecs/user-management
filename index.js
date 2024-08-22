@@ -70,6 +70,10 @@ userName.addEventListener("input", () => {
   userNameError.textContent = "";
 });
 
+groupNameInput.addEventListener("input", () => {
+  groupNameError.textContent = "";
+});
+
 email.addEventListener("input", () => {
   emailError.textContent = "";
 });
@@ -363,7 +367,7 @@ function createTableRow(user) {
 <td>${firstname}</td>
 <td>${lastname}</td>
 <td>${email}</td>
-<td> <button class="edit-btn"  >Edit</button> <button class="delete-btn"  >Delete</button> </td> 
+<td> <button class="edit-btn button"  >Edit</button> <button class="delete-btn button red"  >Delete</button> </td> 
 `;
   const deleteBtn = tableRow.querySelector(".delete-btn");
   const editBtn = tableRow.querySelector(".edit-btn");
@@ -490,6 +494,12 @@ function validateGroupName(groupName) {
     addError(groupNameError);
     return false;
   }
+
+  if(checkPropertyValueExists("groupname",groupName,"groups")){
+    groupNameError.textContent = "Group name is Already exists";
+    addError(groupNameError);
+    return false;
+  }
   return true;
 }
 
@@ -514,7 +524,7 @@ function createTableGroupRow(group) {
 <td>${String(id)}</td>
 <td>${groupname}</td>
 
-<td> <div class="btn-group-container">  <button class="add-user" id="add-group-users" >Add Users/Remove Users</button><button class="view-user"  >View members</button> <button class="delete-group-btn"  >delete group</button>  </div> </td> 
+<td> <div class="btn-group-container">  <button class="add-user button" id="add-group-users" >Add Users/Remove Users</button><button class="view-user button"  >View members</button> <button class="delete-group-btn button"  >delete group</button>  </div> </td> 
 `;
   const deleteBtn = tableRow.querySelector(".delete-group-btn");
   const addUsersAndRemoveUsersBtn = tableRow.querySelector("#add-group-users");
@@ -700,6 +710,11 @@ function validateRoleName(roleInputValue) {
     addError(roleNameError);
     return false;
   }
+  if(checkPropertyValueExists("rolename",roleInputValue,"roles")){
+    roleNameError.textContent = "Role name Already Exists";
+    addError(roleNameError);
+    return false;
+  }
   return true;
 }
 
@@ -734,10 +749,10 @@ function createTableRoleRow(role) {
   tableRow.innerHTML = `
 <td>${String(id)}</td>
 <td id="role-name">${rolename}</td>
-<td><button id="role-assignees-btn">View Assignees</button> </td>
+<td><button id="role-assignees-btn" class="button">View Assignees</button> </td>
 <td>${description}</td>
 
-<td> <div class="btn-group-container">  <button class="add-user" id="add-role-users" >Add Role to Users</button><button class="view-user" id="add-role-group"  >Add Role to Groups</button>  </div> </td> 
+<td> <div class="btn-group-container">  <button class="add-user button" id="add-role-users" >Add Role to Users</button><button class="view-user button" id="add-role-group"  >Add Role to Groups</button>  </div> </td> 
 `;
   // const deleteBtn = tableRow.querySelector(".delete-group-btn");
   const addUsersToRoleBtn = tableRow.querySelector("#add-role-users");
